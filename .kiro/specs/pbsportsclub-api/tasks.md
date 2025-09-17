@@ -47,26 +47,39 @@
   - Implement TeamMemberRepository with membership management
   - _Requirements: 7.1, 7.2, 7.3, 8.1, 8.2, 8.3_
 
-- [ ] 5. Create application services layer
-- [ ] 5.1 Implement AuthService for user authentication
+- [x] 5. Create application services layer
+
+
+
+
+
+- [x] 5.1 Implement AuthService for user authentication
+
+
   - Create signup method with password hashing using bcrypt
   - Create login method with JWT token generation
   - Implement logout functionality and token validation
   - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 2.4, 11.2, 11.3_
 
-- [ ] 5.2 Implement UserService for profile management
+- [x] 5.2 Implement UserService for profile management
+
+
   - Create getUserProfile method for retrieving user data
   - Implement updateUserProfile method for profile updates
   - Add user role management functionality
   - _Requirements: 1.4, 2.3_
 
-- [ ] 5.3 Implement LeagueService for league management
+- [x] 5.3 Implement LeagueService for league management
+
+
   - Create getLeagueBySlug method for public league access
   - Implement createLeague, updateLeague, deleteLeague for organizers
   - Add getAllLeagues method for administrative access
   - _Requirements: 3.1, 3.3, 7.1, 7.2, 7.3_
 
-- [ ] 5.4 Implement TeamService for team operations
+- [x] 5.4 Implement TeamService for team operations
+
+
   - Create createTeam method with automatic captain assignment
   - Implement getTeamById and getTeamsByLeague methods
   - Add joinTeam method with membership status handling
