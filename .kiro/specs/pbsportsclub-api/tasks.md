@@ -24,7 +24,12 @@
   - Set up database migrations and seeding utilities
   - _Requirements: 10.3, 10.4_
 
-- [ ] 3. Implement core domain models and types
+- [x] 3. Implement core domain models and types
+
+
+
+
+
   - Create TypeScript interfaces for User, League, Team, and TeamMember entities
   - Define enums for UserRole, MemberRole, and MemberStatus
   - Implement domain validation rules and business logic
