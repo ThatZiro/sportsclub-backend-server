@@ -29,7 +29,8 @@ export async function checkDatabaseConnection(): Promise<boolean> {
     await prisma.$queryRaw`SELECT 1`;
     return true;
   } catch (error) {
-    console.error('Database connection failed:', error);
+    const { appLogger } = await import('../../config/logger');
+    appLogger.error('Database connection failed', undefined, { error: (error as Error).message });
     return false;
   }
 }

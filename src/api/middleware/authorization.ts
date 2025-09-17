@@ -140,7 +140,9 @@ export const requireCaptainOrOrganizer = async (
 
     next();
   } catch (error) {
-    console.error('Authorization error:', error);
+    import('../../config/logger').then(({ appLogger }) => {
+      appLogger.logError(error as Error, req, { middleware: 'authorization' });
+    });
     res.status(500).json({
       error: 'Internal server error',
       message: 'Authorization service unavailable'

@@ -10,7 +10,7 @@ import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger';
 import router from './api/routes/router';
-import { errorHandler } from './api/middleware/errorHandler';
+import { errorHandler, requestLogger, requestId } from './api/middleware';
 
 // Create Express application
 const app = express();
@@ -41,6 +41,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Cookie parsing middleware
 app.use(cookieParser());
+
+// Request logging middleware
+app.use(requestId);
+app.use(requestLogger);
 
 // API Documentation - Swagger UI
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {

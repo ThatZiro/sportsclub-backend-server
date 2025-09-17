@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Prisma } from '@prisma/client';
+import { appLogger } from '../../config/logger';
 
 /**
  * Custom application error class
@@ -75,17 +76,12 @@ export const errorHandler = (
 ): void => {
   let statusCode = 500;
   let message = 'Internal server error';
-  let details: any = undefined;
 
-  // Log the error for debugging
-  console.error('Error occurred:', {
-    message: error.message,
-    stack: error.stack,
-    url: req.url,
-    method: req.method,
+  // Log the error with full context
+  appLogger.logError(error, req, {
     body: req.body,
     params: req.params,
-    query: req.query
+    query: req.query,
   });
 
   // Handle custom application errors
@@ -137,21 +133,94 @@ export const errorHandler = (
     message = 'Database error occurred';
   }
 
-  // In development, include error details
-  if (process.env['NODE_ENV'] === 'development') {
-    details = {
-      stack: error.stack,
-      originalError: error.message
+  // Sanitize error response for production
+  const errorResponse = sanitizeErrorResponse(error, statusCode, message, req);
+
+  // Send error response
+  res.status(statusCode).json(errorResponse);
+};
+
+/**
+ * Sanitize error response based on environment
+ */
+function sanitizeErrorResponse(
+  error: Error,
+  statusCode: number,
+  message: string,
+  req: Request
+): any {
+  const isDevelopment = process.env['NODE_ENV'] === 'development';
+  const isProduction = process.env['NODE_ENV'] === 'production';
+
+  const baseResponse = {
+    error: getErrorType(statusCode),
+    message: sanitizeErrorMessage(message, statusCode, isProduction),
+    timestamp: new Date().toISOString(),
+    path: req.originalUrl || req.url,
+    requestId: req.headers['x-request-id'],
+  };
+
+  // In development, include additional debugging information
+  if (isDevelopment) {
+    return {
+      ...baseResponse,
+      details: {
+        stack: error.stack,
+        originalError: error.message,
+        name: error.name,
+      },
     };
   }
 
-  // Send error response
-  res.status(statusCode).json({
-    error: getErrorType(statusCode),
-    message,
-    ...(details && { details })
-  });
-};
+  // In production, only include safe information
+  if (isProduction) {
+    // For 5xx errors, use generic message to avoid leaking internal details
+    if (statusCode >= 500) {
+      return {
+        ...baseResponse,
+        message: 'An internal server error occurred',
+      };
+    }
+  }
+
+  return baseResponse;
+}
+
+/**
+ * Sanitize error messages for production
+ */
+function sanitizeErrorMessage(
+  message: string,
+  statusCode: number,
+  isProduction: boolean
+): string {
+  if (!isProduction) {
+    return message;
+  }
+
+  // For server errors (5xx), use generic messages
+  if (statusCode >= 500) {
+    return 'An internal server error occurred';
+  }
+
+  // For client errors (4xx), sanitize but keep informative
+  const sensitivePatterns = [
+    /database/gi,
+    /prisma/gi,
+    /connection/gi,
+    /internal/gi,
+    /server/gi,
+    /stack/gi,
+    /error:/gi,
+  ];
+
+  let sanitized = message;
+  for (const pattern of sensitivePatterns) {
+    sanitized = sanitized.replace(pattern, '[REDACTED]');
+  }
+
+  return sanitized;
+}
 
 /**
  * Get error type based on status code

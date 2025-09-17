@@ -81,7 +81,9 @@ export const authMiddleware = async (
     }
 
     // Log unexpected errors
-    console.error('Auth middleware error:', error);
+    import('../../config/logger').then(({ appLogger }) => {
+      appLogger.logError(error as Error, req, { middleware: 'auth' });
+    });
     res.status(500).json({
       error: 'Internal server error',
       message: 'Authentication service unavailable'

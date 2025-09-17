@@ -39,7 +39,9 @@ export const validate = (schema: z.ZodSchema) => {
       }
 
       // Handle unexpected errors
-      console.error('Validation middleware error:', error);
+      import('../../config/logger').then(({ appLogger }) => {
+        appLogger.logError(error as Error, req, { middleware: 'validation' });
+      });
       res.status(500).json({
         error: 'Internal server error',
         message: 'Validation service unavailable'
@@ -73,7 +75,9 @@ export const validateBody = (schema: z.ZodSchema) => {
         return;
       }
 
-      console.error('Body validation middleware error:', error);
+      import('../../config/logger').then(({ appLogger }) => {
+        appLogger.logError(error as Error, req, { middleware: 'bodyValidation' });
+      });
       res.status(500).json({
         error: 'Internal server error',
         message: 'Validation service unavailable'
@@ -107,7 +111,9 @@ export const validateParams = (schema: z.ZodSchema) => {
         return;
       }
 
-      console.error('Params validation middleware error:', error);
+      import('../../config/logger').then(({ appLogger }) => {
+        appLogger.logError(error as Error, req, { middleware: 'paramsValidation' });
+      });
       res.status(500).json({
         error: 'Internal server error',
         message: 'Validation service unavailable'
@@ -141,7 +147,9 @@ export const validateQuery = (schema: z.ZodSchema) => {
         return;
       }
 
-      console.error('Query validation middleware error:', error);
+      import('../../config/logger').then(({ appLogger }) => {
+        appLogger.logError(error as Error, req, { middleware: 'queryValidation' });
+      });
       res.status(500).json({
         error: 'Internal server error',
         message: 'Validation service unavailable'

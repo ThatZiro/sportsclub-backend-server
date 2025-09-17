@@ -6,6 +6,7 @@
 import dotenv from 'dotenv';
 import app from './app';
 import { PrismaClient } from '@prisma/client';
+import { appLogger } from './config/logger';
 
 // Load environment variables
 dotenv.config();
@@ -14,22 +15,22 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 // Server configuration
-const PORT = process.env.PORT || 3000;
-const NODE_ENV = process.env.NODE_ENV || 'development';
+const PORT = process.env['PORT'] || 3000;
+const NODE_ENV = process.env['NODE_ENV'] || 'development';
 
 // Graceful shutdown handler
 const gracefulShutdown = async (signal: string) => {
-  console.log(`\n${signal} received. Starting graceful shutdown...`);
+  appLogger.info(`${signal} received. Starting graceful shutdown...`);
   
   try {
     // Close database connection
     await prisma.$disconnect();
-    console.log('Database connection closed.');
+    appLogger.info('Database connection closed.');
     
     // Exit process
     process.exit(0);
   } catch (error) {
-    console.error('Error during graceful shutdown:', error);
+    appLogger.error('Error during graceful shutdown', undefined, { error: (error as Error).message });
     process.exit(1);
   }
 };
@@ -39,13 +40,13 @@ const startServer = async () => {
   try {
     // Test database connection
     await prisma.$connect();
-    console.log('✅ Database connected successfully');
+    appLogger.info('Database connected successfully');
     
     // Start HTTP server
     const server = app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📚 API Documentation: http://localhost:${PORT}/docs`);
-      console.log(`🔍 Environment: ${NODE_ENV}`);
+      appLogger.info(`Server running on port ${PORT}`);
+      appLogger.info(`API Documentation: http://localhost:${PORT}/docs`);
+      appLogger.info(`Environment: ${NODE_ENV}`);
     });
     
     // Handle graceful shutdown
@@ -54,7 +55,7 @@ const startServer = async () => {
     
     return server;
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
+    appLogger.error('Failed to start server', undefined, { error: (error as Error).message });
     process.exit(1);
   }
 };

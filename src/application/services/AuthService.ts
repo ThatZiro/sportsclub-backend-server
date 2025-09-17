@@ -33,10 +33,10 @@ export class AuthService {
   private readonly jwtExpiresIn: string;
 
   constructor(private userRepository: IUserRepository) {
-    this.jwtSecret = process.env.JWT_SECRET || 'fallback-secret-key';
-    this.jwtExpiresIn = process.env.JWT_EXPIRES_IN || '1h';
+    this.jwtSecret = process.env['JWT_SECRET'] || 'fallback-secret-key';
+    this.jwtExpiresIn = process.env['JWT_EXPIRES_IN'] || '1h';
     
-    if (!process.env.JWT_SECRET) {
+    if (!process.env['JWT_SECRET']) {
       console.warn('JWT_SECRET not set in environment variables, using fallback');
     }
   }

@@ -46,3 +46,9 @@ export {
   NotFoundError,
   ConflictError
 } from './errorHandler';
+
+// Request logging middleware
+export {
+  requestLogger,
+  requestId
+} from './requestLogger';
