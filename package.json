@@ -22,9 +22,17 @@
     "db:setup": "npm run db:generate && npm run db:migrate && npm run db:seed",
     "db:setup-dev": "tsx src/scripts/setup-database.ts",
     "docker:db": "docker-compose up db -d",
-    "docker:down": "docker-compose down"
+    "docker:down": "docker-compose down",
+    "docs:test": "tsx src/scripts/test-swagger.ts",
+    "docs:serve": "npm run dev"
   },
-  "keywords": ["sports", "league", "api", "typescript", "node"],
+  "keywords": [
+    "sports",
+    "league",
+    "api",
+    "typescript",
+    "node"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
@@ -36,6 +44,8 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.11.24",
     "@types/supertest": "^6.0.2",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
     "eslint": "^8.57.0",

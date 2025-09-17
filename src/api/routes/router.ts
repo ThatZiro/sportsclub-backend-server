@@ -16,7 +16,32 @@ router.use('/leagues', leagueRoutes);
 router.use('/teams', teamRoutes);
 router.use('/public', publicRoutes);
 
-// Health check endpoint
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     tags: [System]
+ *     summary: Health check endpoint
+ *     description: Returns the current health status of the API
+ *     responses:
+ *       200:
+ *         description: API is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: API is healthy
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-03-15T10:30:00.000Z"
+ */
 router.get('/health', (_req, res) => {
   res.status(200).json({
     success: true,

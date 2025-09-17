@@ -33,19 +33,223 @@ router.use(authMiddleware);
 // Apply organizer role requirement to all league routes
 router.use(requireRole(UserRole.ORGANIZER, UserRole.ADMIN));
 
-// POST /leagues - Create new league
+/**
+ * @swagger
+ * /leagues:
+ *   post:
+ *     tags: [Leagues]
+ *     summary: Create a new league
+ *     description: Creates a new league (organizer/admin only)
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateLeagueRequest'
+ *     responses:
+ *       201:
+ *         description: League created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: League created successfully
+ *                 league:
+ *                   $ref: '#/components/schemas/League'
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       409:
+ *         description: League slug already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             example:
+ *               success: false
+ *               message: League slug already exists
+ */
 router.post('/', validate(createLeagueSchema), leagueController.createLeague);
 
-// GET /leagues - Get all leagues
+/**
+ * @swagger
+ * /leagues:
+ *   get:
+ *     tags: [Leagues]
+ *     summary: Get all leagues
+ *     description: Retrieves all leagues in the system (organizer/admin only)
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Leagues retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 leagues:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/League'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
+ */
 router.get('/', leagueController.getAllLeagues);
 
-// GET /leagues/:id - Get league by ID
+/**
+ * @swagger
+ * /leagues/{id}:
+ *   get:
+ *     tags: [Leagues]
+ *     summary: Get league by ID
+ *     description: Retrieves a specific league by its ID (organizer/admin only)
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: League ID
+ *         example: clw1234567890abcdef
+ *     responses:
+ *       200:
+ *         description: League retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 league:
+ *                   $ref: '#/components/schemas/League'
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
+ */
 router.get('/:id', validate(leagueIdParamSchema), leagueController.getLeagueById);
 
-// PATCH /leagues/:id - Update league
+/**
+ * @swagger
+ * /leagues/{id}:
+ *   patch:
+ *     tags: [Leagues]
+ *     summary: Update league
+ *     description: Updates an existing league (organizer/admin only)
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: League ID
+ *         example: clw1234567890abcdef
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Updated League Name
+ *               season:
+ *                 type: string
+ *                 example: Fall 2024
+ *               isActive:
+ *                 type: boolean
+ *                 example: false
+ *     responses:
+ *       200:
+ *         description: League updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: League updated successfully
+ *                 league:
+ *                   $ref: '#/components/schemas/League'
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
+ */
 router.patch('/:id', validate(updateLeagueSchema), leagueController.updateLeague);
 
-// DELETE /leagues/:id - Delete league
+/**
+ * @swagger
+ * /leagues/{id}:
+ *   delete:
+ *     tags: [Leagues]
+ *     summary: Delete league
+ *     description: Deletes a league and all associated teams (organizer/admin only)
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: League ID
+ *         example: clw1234567890abcdef
+ *     responses:
+ *       200:
+ *         description: League deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SuccessResponse'
+ *             example:
+ *               success: true
+ *               message: League deleted successfully
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       403:
+ *         $ref: '#/components/responses/ForbiddenError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
+ */
 router.delete('/:id', validate(leagueIdParamSchema), leagueController.deleteLeague);
 
 export default router;
