@@ -15,7 +15,14 @@
     "format:check": "prettier --check src/**/*.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:seed": "tsx src/scripts/seed.ts"
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:migrate:reset": "prisma migrate reset --force",
+    "db:seed": "tsx src/scripts/seed.ts",
+    "db:studio": "prisma studio",
+    "db:setup": "npm run db:generate && npm run db:migrate && npm run db:seed",
+    "db:setup-dev": "tsx src/scripts/setup-database.ts",
+    "docker:db": "docker-compose up db -d",
+    "docker:down": "docker-compose down"
   },
   "keywords": ["sports", "league", "api", "typescript", "node"],
   "author": "",

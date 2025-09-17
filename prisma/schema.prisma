@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  role         UserRole @default(USER)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  captainedTeams Team[]       @relation("TeamCaptain")
+  teamMembers    TeamMember[]
+
+  @@map("users")
+}
+
+model League {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  season    String?
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  teams Team[]
+
+  @@map("leagues")
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  name      String
+  color     String?
+  leagueId  String   @map("league_id")
+  captainId String   @map("captain_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  league  League       @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  captain User         @relation("TeamCaptain", fields: [captainId], references: [id])
+  members TeamMember[]
+
+  // Constraints
+  @@unique([name, leagueId], name: "unique_team_name_per_league")
+  @@map("teams")
+}
+
+model TeamMember {
+  id        String       @id @default(cuid())
+  teamId    String       @map("team_id")
+  userId    String       @map("user_id")
+  role      MemberRole   @default(MEMBER)
+  status    MemberStatus @default(PENDING)
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Constraints
+  @@unique([teamId, userId], name: "unique_team_membership")
+  @@map("team_members")
+}
+
+enum UserRole {
+  USER
+  ORGANIZER
+  ADMIN
+}
+
+enum MemberRole {
+  CAPTAIN
+  MEMBER
+}
+
+enum MemberStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

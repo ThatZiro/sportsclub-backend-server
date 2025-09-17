@@ -12,7 +12,13 @@
   - Set up project directory structure following clean architecture
   - _Requirements: 10.1, 10.2_
 
-- [ ] 2. Configure database and ORM setup
+- [x] 2. Configure database and ORM setup
+
+
+
+
+
+
   - Install and configure Prisma ORM with PostgreSQL
   - Create database schema with User, League, Team, and TeamMember models
   - Set up database migrations and seeding utilities
