@@ -86,9 +86,209 @@ src/
 
 See `.env.example` for all available configuration options.
 
+## API Examples
+
+### Authentication
+
+#### Sign Up
+```bash
+POST /api/auth/signup
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+#### Login
+```bash
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+#### Logout
+```bash
+POST /api/auth/logout
+```
+
+### User Management
+
+#### Get Current User Profile
+```bash
+GET /api/users/profile
+Authorization: Bearer <jwt-token>
+```
+
+#### Update User Profile
+```bash
+PUT /api/users/profile
+Authorization: Bearer <jwt-token>
+Content-Type: application/json
+
+{
+  "name": "John Smith",
+  "email": "johnsmith@example.com"
+}
+```
+
+#### Update User Role (Admin Only)
+```bash
+PUT /api/users/:userId/role
+Authorization: Bearer <admin-jwt-token>
+Content-Type: application/json
+
+{
+  "role": "ADMIN"
+}
+```
+
+### League Management
+
+#### Create League (Admin Only)
+```bash
+POST /api/leagues
+Authorization: Bearer <admin-jwt-token>
+Content-Type: application/json
+
+{
+  "name": "Summer Basketball League",
+  "slug": "summer-basketball-2024",
+  "season": "Summer 2024",
+  "isActive": true
+}
+```
+
+#### Get All Leagues
+```bash
+GET /api/leagues
+```
+
+#### Get League by ID
+```bash
+GET /api/leagues/:id
+```
+
+#### Get League by Slug
+```bash
+GET /api/leagues/slug/:slug
+```
+
+#### Update League (Admin Only)
+```bash
+PUT /api/leagues/:id
+Authorization: Bearer <admin-jwt-token>
+Content-Type: application/json
+
+{
+  "name": "Updated League Name",
+  "isActive": false
+}
+```
+
+#### Delete League (Admin Only)
+```bash
+DELETE /api/leagues/:id
+Authorization: Bearer <admin-jwt-token>
+```
+
+### Team Management
+
+#### Create Team
+```bash
+POST /api/teams
+Authorization: Bearer <jwt-token>
+Content-Type: application/json
+
+{
+  "name": "Thunder Bolts",
+  "color": "#FF5733",
+  "leagueId": "clh1234567890abcdef"
+}
+```
+
+#### Get Teams by League
+```bash
+GET /api/leagues/:leagueId/teams
+```
+
+#### Get Team by ID
+```bash
+GET /api/teams/:id
+```
+
+#### Update Team (Captain/Admin Only)
+```bash
+PUT /api/teams/:id
+Authorization: Bearer <jwt-token>
+Content-Type: application/json
+
+{
+  "name": "Lightning Bolts",
+  "color": "#33FF57",
+  "captainId": "clh0987654321fedcba"
+}
+```
+
+#### Join Team
+```bash
+POST /api/teams/:id/join
+Authorization: Bearer <jwt-token>
+```
+
+#### Approve Team Member (Captain/Admin Only)
+```bash
+POST /api/teams/:id/members/:userId/approve
+Authorization: Bearer <jwt-token>
+```
+
+#### Delete Team (Captain/Admin Only)
+```bash
+DELETE /api/teams/:id
+Authorization: Bearer <jwt-token>
+```
+
+### Response Examples
+
+#### Success Response
+```json
+{
+  "success": true,
+  "data": {
+    "id": "clh1234567890abcdef",
+    "name": "Thunder Bolts",
+    "color": "#FF5733",
+    "createdAt": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+#### Error Response
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Team name must be at least 2 characters",
+    "details": [
+      {
+        "field": "name",
+        "message": "Team name must be at least 2 characters"
+      }
+    ]
+  }
+}
+```
+
 ## API Documentation
 
-Once the server is running, API documentation is available at `/docs`.
+Once the server is running, comprehensive API documentation is available at `/docs`.
 
 ## License
 

@@ -86,7 +86,10 @@
   - Implement approveMember method for captain/organizer approval
   - _Requirements: 4.1, 4.2, 4.3, 5.1, 5.2, 5.3, 6.1, 6.2, 6.3, 8.2_
 
-- [ ] 6. Build API middleware and utilities
+- [-] 6. Build API middleware and utilities
+
+
+
   - Implement JWT authentication middleware with HTTP-only cookies
   - Create role-based authorization guards for different user roles
   - Set up rate limiting middleware for authentication endpoints
