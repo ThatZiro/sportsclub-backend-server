@@ -101,27 +101,40 @@
   - Implement Zod validation schemas for request validation
   - _Requirements: 2.3, 6.2, 6.3, 7.4, 8.4, 11.1, 11.4_
 
-- [ ] 7. Create API controllers and routes
-- [ ] 7.1 Implement AuthController
+- [x] 7. Create API controllers and routes
+
+
+
+
+
+- [x] 7.1 Implement AuthController
+
+
   - Create POST /auth/signup endpoint with validation
   - Create POST /auth/login endpoint with JWT cookie setting
   - Create POST /auth/logout endpoint with cookie clearing
   - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 2.4_
 
-- [ ] 7.2 Implement UserController
+- [x] 7.2 Implement UserController
+
+
   - Create GET /me endpoint for user profile retrieval
   - Create PATCH /me endpoint for profile updates
   - Add authentication middleware to protect endpoints
   - _Requirements: 2.3_
 
-- [ ] 7.3 Implement LeagueController
+- [x] 7.3 Implement LeagueController
+
+
   - Create POST /leagues endpoint for organizer league creation
   - Create GET /leagues, GET /leagues/:id endpoints for league management
   - Create PATCH /leagues/:id and DELETE /leagues/:id for updates
   - Add organizer role authorization
   - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
-- [ ] 7.4 Implement TeamController
+- [x] 7.4 Implement TeamController
+
+
   - Create POST /teams endpoint for team creation
   - Create GET /teams/:id endpoint with member details
   - Create PATCH /teams/:id and DELETE /teams/:id with proper authorization
@@ -129,7 +142,9 @@
   - Create POST /teams/:id/members/:userId/approve for member approval
   - _Requirements: 4.1, 4.2, 4.3, 5.1, 5.2, 6.1, 6.2, 8.1, 8.2, 8.3_
 
-- [ ] 7.5 Implement PublicController
+- [x] 7.5 Implement PublicController
+
+
   - Create GET /public/leagues/:slug endpoint for public league access
   - Create GET /public/leagues/:slug/teams endpoint for public team listing
   - Ensure no authentication required for public endpoints
