@@ -35,7 +35,12 @@
   - Implement domain validation rules and business logic
   - _Requirements: 1.4, 4.4, 5.4, 6.1_
 
-- [ ] 4. Build infrastructure layer with repositories
+- [x] 4. Build infrastructure layer with repositories
+
+
+
+
+
   - Implement UserRepository with CRUD operations
   - Implement LeagueRepository with CRUD operations
   - Implement TeamRepository with CRUD operations
