@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: pbsports-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pbsports}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-pbsports}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pbsports-network
+
+  # API Server
+  api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: pbsports-api
+    restart: unless-stopped
+    environment:
+      # Database Configuration
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-pbsports}
+      
+      # Server Configuration
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${PORT:-3000}
+      
+      # JWT Configuration
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-1h}
+      
+      # League Configuration
+      - LEAGUE_SLUG=${LEAGUE_SLUG:-spring-2024}
+      - LEAGUE_NAME=${LEAGUE_NAME:-Spring 2024 League}
+      - LEAGUE_SEASON=${LEAGUE_SEASON:-Spring 2024}
+      
+      # Security Configuration
+      - BCRYPT_ROUNDS=${BCRYPT_ROUNDS:-12}
+      - AUTO_APPROVE_JOINS=${AUTO_APPROVE_JOINS:-false}
+      
+      # Rate Limiting Configuration
+      - AUTH_RATE_LIMIT_WINDOW_MS=${AUTH_RATE_LIMIT_WINDOW_MS:-60000}
+      - AUTH_RATE_LIMIT_MAX_REQUESTS=${AUTH_RATE_LIMIT_MAX_REQUESTS:-10}
+      - API_RATE_LIMIT_WINDOW_MS=${API_RATE_LIMIT_WINDOW_MS:-60000}
+      - API_RATE_LIMIT_MAX_REQUESTS=${API_RATE_LIMIT_MAX_REQUESTS:-100}
+    ports:
+      - "${API_PORT:-3000}:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - pbsports-network
+    profiles:
+      - full-stack
+
+  # Database initialization service
+  db-migrate:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: pbsports-db-migrate
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-pbsports}
+      - NODE_ENV=${NODE_ENV:-production}
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["sh", "-c", "npx prisma migrate deploy && npx tsx scripts/seed.ts"]
+    networks:
+      - pbsports-network
+    profiles:
+      - migration
+
+networks:
+  pbsports-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
