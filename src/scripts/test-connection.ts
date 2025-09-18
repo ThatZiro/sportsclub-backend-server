@@ -6,7 +6,7 @@ dotenv.config();
 
 async function testDatabaseSetup() {
   console.log('🔌 Testing database setup...');
-  console.log(`📍 Database URL: ${process.env.DATABASE_URL?.replace(/:[^:@]*@/, ':***@')}`);
+  console.log(`📍 Database URL: ${process.env['DATABASE_URL']?.replace(/:[^:@]*@/, ':***@')}`);
   
   try {
     // Test basic connection

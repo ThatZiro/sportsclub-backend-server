@@ -213,7 +213,7 @@ export class TeamService {
     }
 
     // Determine initial status based on AUTO_APPROVE_JOINS setting
-    const autoApprove = process.env.AUTO_APPROVE_JOINS === 'true';
+    const autoApprove = process.env['AUTO_APPROVE_JOINS'] === 'true';
     const initialStatus = autoApprove ? MemberStatus.APPROVED : MemberStatus.PENDING;
 
     // Create team membership

@@ -9,7 +9,7 @@ import { UserRole, MemberRole, MemberStatus } from '../domain/enums';
 export const testDb = new PrismaClient({
   datasources: {
     db: {
-      url: process.env.DATABASE_URL || 'postgresql://test:test@localhost:5432/pbsports_test'
+      url: process.env['DATABASE_URL'] || 'postgresql://test:test@localhost:5432/pbsports_test'
     }
   }
 });

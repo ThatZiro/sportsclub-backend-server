@@ -12,10 +12,10 @@ async function main() {
 
   try {
     // Get configuration from environment
-    const leagueSlug = process.env.LEAGUE_SLUG || 'spring-2024';
-    const leagueName = process.env.LEAGUE_NAME || 'Spring 2024 League';
-    const leagueSeason = process.env.LEAGUE_SEASON || 'Spring 2024';
-    const bcryptRounds = parseInt(process.env.BCRYPT_ROUNDS || '12');
+    const leagueSlug = process.env['LEAGUE_SLUG'] || 'spring-2024';
+    const leagueName = process.env['LEAGUE_NAME'] || 'Spring 2024 League';
+    const leagueSeason = process.env['LEAGUE_SEASON'] || 'Spring 2024';
+    const bcryptRounds = parseInt(process.env['BCRYPT_ROUNDS'] || '12');
 
     // Create or update the main league
     console.log(`📋 Creating/updating league: ${leagueName}`);

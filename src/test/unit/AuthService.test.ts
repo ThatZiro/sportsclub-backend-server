@@ -196,7 +196,7 @@ describe('AuthService', () => {
       const result = await authService.validateToken('valid-token');
 
       // Assert
-      expect(mockJwt.verify).toHaveBeenCalledWith('valid-token', process.env.JWT_SECRET);
+      expect(mockJwt.verify).toHaveBeenCalledWith('valid-token', process.env['JWT_SECRET']);
       expect(mockUserRepo.findById).toHaveBeenCalledWith('user-1');
       expect(result).toEqual(user);
     });
