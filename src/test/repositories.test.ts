@@ -28,10 +28,15 @@ describe('Repository Integration Tests', () => {
 
   beforeEach(async () => {
     // Clean up test data
-    await prisma.teamMember.deleteMany();
-    await prisma.team.deleteMany();
-    await prisma.league.deleteMany();
-    await prisma.user.deleteMany();
+    try {
+      await prisma.teamMember.deleteMany();
+      await prisma.team.deleteMany();
+      await prisma.league.deleteMany();
+      await prisma.user.deleteMany();
+    } catch (error) {
+      // Ignore errors during cleanup (tables might not exist yet)
+      console.warn('Warning during test cleanup:', error);
+    }
   });
 
   afterAll(async () => {

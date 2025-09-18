@@ -19,10 +19,15 @@ export const testDb = new PrismaClient({
  * Clean all test data from the database
  */
 export async function cleanDatabase(): Promise<void> {
-  await testDb.teamMember.deleteMany();
-  await testDb.team.deleteMany();
-  await testDb.league.deleteMany();
-  await testDb.user.deleteMany();
+  try {
+    await testDb.teamMember.deleteMany();
+    await testDb.team.deleteMany();
+    await testDb.league.deleteMany();
+    await testDb.user.deleteMany();
+  } catch (error) {
+    // Ignore errors during cleanup (tables might not exist yet)
+    console.warn('Warning during database cleanup:', error);
+  }
 }
 
 /**

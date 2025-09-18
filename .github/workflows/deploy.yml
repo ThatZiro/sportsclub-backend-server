@@ -43,12 +43,12 @@ jobs:
         echo "JWT_SECRET=test-jwt-secret-key-for-testing-only" >> .env.test
         echo "NODE_ENV=test" >> .env.test
 
-    - name: Generate Prisma client and run migrations
+    - name: Generate Prisma client and setup database
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pbsports_test
       run: |
         npx prisma generate
-        npx prisma migrate deploy
+        npx prisma db push --accept-data-loss
 
     - name: Run tests
       env:
@@ -145,6 +145,11 @@ jobs:
           echo "NODE_ENV=production" >> .env
           echo "PORT=3000" >> .env
           echo "LEAGUE_SLUG=${{ secrets.LEAGUE_SLUG }}" >> .env
+          
+          # Install dependencies and setup database
+          npm ci --only=production
+          npx prisma generate
+          npx prisma migrate deploy
           
           # Make scripts executable
           chmod +x deploy.sh
