@@ -1,0 +1,54 @@
+# Development override for docker-compose
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+version: '3.8'
+
+services:
+  # Development API with hot reload
+  api-dev:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      target: builder  # Use builder stage for development
+    container_name: pbsports-api-dev
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/pbsports
+      - NODE_ENV=development
+      - PORT=3000
+      - JWT_SECRET=dev-jwt-secret-change-in-production
+      - JWT_EXPIRES_IN=1h
+      - LEAGUE_SLUG=spring-2024
+      - LEAGUE_NAME=Spring 2024 League
+      - LEAGUE_SEASON=Spring 2024
+      - BCRYPT_ROUNDS=10  # Lower for faster development
+      - AUTO_APPROVE_JOINS=true  # Easier testing
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src:ro
+      - ./prisma:/app/prisma:ro
+      - /app/node_modules  # Prevent overwriting node_modules
+    command: ["npm", "run", "dev"]
+    networks:
+      - pbsports-network
+    profiles:
+      - development
+
+  # Database with development settings
+  db:
+    environment:
+      POSTGRES_DB: pbsports_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+
+volumes:
+  postgres_dev_data:

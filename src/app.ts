@@ -71,6 +71,17 @@ app.get('/docs.json', (_req, res) => {
 // API Routes
 app.use('/api', router);
 
+// Health check endpoint
+app.get('/health', (_req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env['NODE_ENV'] || 'development',
+    version: process.env['npm_package_version'] || '1.0.0'
+  });
+});
+
 // Root endpoint - redirect to documentation
 app.get('/', (_req, res) => {
   res.redirect('/docs');
