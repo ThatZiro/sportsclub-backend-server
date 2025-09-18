@@ -1,0 +1,77 @@
+name: Test Suite
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pbsports_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Setup test environment
+      run: |
+        cp .env.example .env.test
+        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/pbsports_test" >> .env.test
+        echo "JWT_SECRET=test-jwt-secret-key-for-testing-only" >> .env.test
+        echo "NODE_ENV=test" >> .env.test
+        echo "LEAGUE_SLUG=pbsports" >> .env.test
+
+    - name: Run database migrations
+      run: |
+        export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/pbsports_test
+        npx prisma migrate deploy
+
+    - name: Run linting
+      run: npm run lint
+
+    - name: Run type checking
+      run: npx tsc --noEmit
+
+    - name: Run unit tests
+      run: npm run test:unit
+
+    - name: Run integration tests
+      run: npm run test:integration
+
+    - name: Build application
+      run: npm run build
+
+    - name: Test build output
+      run: |
+        if [ ! -d "dist" ]; then
+          echo "Build failed - dist directory not found"
+          exit 1
+        fi
+        if [ ! -f "dist/index.js" ]; then
+          echo "Build failed - main entry point not found"
+          exit 1
+        fi
+        echo "✅ Build output validated"
