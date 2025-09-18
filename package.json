@@ -34,6 +34,10 @@
     "docker:dev:logs": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml logs -f",
     "docker:dev:down": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml down",
     "docker:validate": "tsx src/scripts/validate-docker.ts",
+    "deploy:aws": "bash scripts/deploy-aws.sh",
+    "aws:update": "bash scripts/deploy-aws.sh update",
+    "aws:status": "bash scripts/deploy-aws.sh status",
+    "aws:logs": "bash scripts/deploy-aws.sh logs",
     "docs:test": "tsx src/scripts/test-swagger.ts",
     "docs:serve": "npm run dev"
   },
@@ -71,6 +75,7 @@
     "typescript": "^5.4.2"
   },
   "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.891.0",
     "@prisma/client": "^5.10.2",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
