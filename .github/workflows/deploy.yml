@@ -1,0 +1,182 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pbsports_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Setup test environment
+      run: |
+        cp .env.example .env.test
+        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/pbsports_test" >> .env.test
+        echo "JWT_SECRET=test-jwt-secret-key-for-testing-only" >> .env.test
+        echo "NODE_ENV=test" >> .env.test
+
+    - name: Run database migrations
+      run: |
+        export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/pbsports_test
+        npx prisma migrate deploy
+
+    - name: Run tests
+      run: npm test
+
+    - name: Run linting
+      run: npm run lint
+
+    - name: Build application
+      run: npm run build
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build application
+      run: npm run build
+
+    - name: Create deployment package
+      run: |
+        mkdir -p deployment
+        cp -r dist deployment/
+        cp package*.json deployment/
+        cp prisma deployment/ -r
+        cp docker-compose.yml deployment/
+        cp Dockerfile deployment/
+        cp scripts/deploy.sh deployment/
+        cp scripts/health-check.sh deployment/
+        tar -czf deployment.tar.gz -C deployment .
+
+    - name: Deploy to AWS EC2
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        port: 22
+        script: |
+          # Create deployment directory
+          mkdir -p /home/ubuntu/pbsportsclub-api
+          cd /home/ubuntu/pbsportsclub-api
+          
+          # Backup current deployment
+          if [ -d "current" ]; then
+            rm -rf backup
+            mv current backup
+          fi
+          
+          # Create new deployment directory
+          mkdir -p current
+
+    - name: Copy deployment files
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "deployment.tar.gz"
+        target: "/home/ubuntu/pbsportsclub-api/"
+
+    - name: Extract and deploy
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        port: 22
+        script: |
+          cd /home/ubuntu/pbsportsclub-api
+          
+          # Extract deployment files
+          tar -xzf deployment.tar.gz -C current/
+          
+          # Set up environment variables
+          cd current
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "NODE_ENV=production" >> .env
+          echo "PORT=3000" >> .env
+          echo "LEAGUE_SLUG=${{ secrets.LEAGUE_SLUG }}" >> .env
+          
+          # Make scripts executable
+          chmod +x deploy.sh
+          chmod +x health-check.sh
+          
+          # Run deployment script
+          ./deploy.sh
+
+    - name: Health check
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        port: 22
+        script: |
+          cd /home/ubuntu/pbsportsclub-api/current
+          
+          # Wait for application to start
+          sleep 30
+          
+          # Run health check
+          if ./health-check.sh; then
+            echo "Deployment successful - application is healthy"
+            # Clean up old backup
+            rm -rf ../backup
+          else
+            echo "Health check failed - rolling back"
+            cd ..
+            # Stop current deployment
+            docker-compose -f current/docker-compose.yml down || true
+            # Restore backup if it exists
+            if [ -d "backup" ]; then
+              rm -rf current
+              mv backup current
+              cd current
+              docker-compose up -d
+              echo "Rollback completed"
+            fi
+            exit 1
+          fi

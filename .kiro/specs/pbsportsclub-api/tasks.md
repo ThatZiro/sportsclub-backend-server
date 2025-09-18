@@ -228,3 +228,16 @@
   - Validate Docker deployment and environment configuration
   - Ensure API documentation is complete and accurate
   - _Requirements: All requirements validation_
+
+- [x] 13. Set up GitHub Actions CI/CD for AWS EC2 deployment
+
+
+
+
+
+  - Create GitHub Actions workflow for automated testing and deployment
+  - Configure deployment to AWS EC2 Ubuntu server on main branch push
+  - Set up SSH access and deployment scripts for the server
+  - Configure environment variables and secrets in GitHub repository
+  - Implement Docker-based deployment with health checks and rollback capability
+  - _Requirements: Automated deployment and continuous integration_
