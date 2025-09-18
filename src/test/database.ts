@@ -11,7 +11,8 @@ export const testDb = new PrismaClient({
     db: {
       url: process.env['DATABASE_URL'] || 'postgresql://test:test@localhost:5432/pbsports_test'
     }
-  }
+  },
+  log: process.env['NODE_ENV'] === 'test' ? [] : ['query', 'info', 'warn', 'error']
 });
 
 /**

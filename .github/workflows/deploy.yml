@@ -43,12 +43,18 @@ jobs:
         echo "JWT_SECRET=test-jwt-secret-key-for-testing-only" >> .env.test
         echo "NODE_ENV=test" >> .env.test
 
-    - name: Run database migrations
+    - name: Generate Prisma client and run migrations
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pbsports_test
       run: |
-        export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/pbsports_test
+        npx prisma generate
         npx prisma migrate deploy
 
     - name: Run tests
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pbsports_test
+        NODE_ENV: test
+        JWT_SECRET: test-jwt-secret-key-for-testing-only
       run: npm test
 
     - name: Run linting
