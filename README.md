@@ -8,6 +8,7 @@ A minimal TypeScript/Node.js backend designed to support a single-page web form 
 - Team creation and management
 - League administration
 - Public league and team information access
+- Automated CI/CD deployment with Docker
 - Role-based access control
 - Comprehensive API documentation with Swagger
 
