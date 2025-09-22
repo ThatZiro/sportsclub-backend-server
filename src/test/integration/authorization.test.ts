@@ -31,19 +31,19 @@ describe('Authorization Integration Tests', () => {
       email: 'organizer@test.com',
       password: 'password123',
     });
-    organizerCookies = organizerLogin.headers['set-cookie'];
+    organizerCookies = organizerLogin.headers['set-cookie'] as string[];
 
     const captainLogin = await request(app).post('/auth/login').send({
       email: 'captain@test.com',
       password: 'password123',
     });
-    captainCookies = captainLogin.headers['set-cookie'];
+    captainCookies = captainLogin.headers['set-cookie'] as string[];
 
     const playerLogin = await request(app).post('/auth/login').send({
       email: 'player@test.com',
       password: 'password123',
     });
-    playerCookies = playerLogin.headers['set-cookie'];
+    playerCookies = playerLogin.headers['set-cookie'] as string[];
   });
 
   afterAll(async () => {
@@ -198,7 +198,7 @@ describe('Authorization Integration Tests', () => {
           password: 'password123',
         });
 
-        const otherCaptainCookies = otherCaptainLogin.headers['set-cookie'];
+        const otherCaptainCookies = otherCaptainLogin.headers['set-cookie'] as string[];
 
         const otherTeamResponse = await request(app)
           .post('/teams')

@@ -50,10 +50,10 @@ describe('Authentication Integration Tests', () => {
       expect(response.body.user.passwordHash).toBeUndefined();
 
       // Check JWT cookie is set
-      const cookies = response.headers['set-cookie'];
+      const cookies = response.headers['set-cookie'] as string[];
       expect(cookies).toBeDefined();
       expect(
-        cookies.some((cookie: string) => cookie.startsWith('token='))
+        cookies?.some((cookie: string) => cookie.startsWith('token='))
       ).toBe(true);
     });
 
@@ -141,10 +141,10 @@ describe('Authentication Integration Tests', () => {
       });
 
       // Check JWT cookie is set
-      const cookies = response.headers['set-cookie'];
+      const cookies = response.headers['set-cookie'] as string[];
       expect(cookies).toBeDefined();
       expect(
-        cookies.some((cookie: string) => cookie.startsWith('token='))
+        cookies?.some((cookie: string) => cookie.startsWith('token='))
       ).toBe(true);
     });
 
@@ -200,7 +200,7 @@ describe('Authentication Integration Tests', () => {
         .post('/auth/signup')
         .send(userData);
 
-      const cookies = loginResponse.headers['set-cookie'];
+      const cookies = loginResponse.headers['set-cookie'] as string[];
 
       // Then logout
       const response = await request(app)
@@ -214,10 +214,10 @@ describe('Authentication Integration Tests', () => {
       });
 
       // Check cookie is cleared
-      const logoutCookies = response.headers['set-cookie'];
+      const logoutCookies = response.headers['set-cookie'] as string[];
       expect(logoutCookies).toBeDefined();
       expect(
-        logoutCookies.some(
+        logoutCookies?.some(
           (cookie: string) =>
             cookie.includes('token=') && cookie.includes('Max-Age=0')
         )
@@ -246,7 +246,7 @@ describe('Authentication Integration Tests', () => {
         .expect(201);
 
       expect(signupResponse.body.success).toBe(true);
-      const signupCookies = signupResponse.headers['set-cookie'];
+      const signupCookies = signupResponse.headers['set-cookie'] as string[];
 
       // 2. Access protected endpoint with signup token
       const profileResponse = await request(app)
@@ -271,7 +271,7 @@ describe('Authentication Integration Tests', () => {
         })
         .expect(200);
 
-      const loginCookies = loginResponse.headers['set-cookie'];
+      const loginCookies = loginResponse.headers['set-cookie'] as string[];
 
       // 5. Access protected endpoint with login token
       await request(app).get('/me').set('Cookie', loginCookies).expect(200);
@@ -300,7 +300,7 @@ describe('Authentication Integration Tests', () => {
       const responses = await Promise.all(requests);
 
       // First request should succeed
-      expect(responses[0].status).toBe(201);
+      expect(responses[0]?.status).toBe(201);
 
       // Some later requests should be rate limited
       const rateLimitedResponses = responses.filter(r => r.status === 429);

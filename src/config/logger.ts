@@ -100,7 +100,7 @@ export interface RequestContext {
 // Create request context from Express request
 export const createRequestContext = (req: Request): RequestContext => {
   return {
-    requestId: (req.headers['x-request-id'] as string) || generateRequestId(),
+    requestId: (req.headers?.['x-request-id'] as string) || generateRequestId(),
     userId: (req as any).user?.id,
     method: req.method,
     url: req.originalUrl || req.url,

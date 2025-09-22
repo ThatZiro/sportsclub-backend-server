@@ -77,6 +77,7 @@ describe('AuthService', () => {
         email: validSignupData.email,
         passwordHash: 'hashedpassword',
         name: validSignupData.name,
+        role: 'USER',
       });
       expect(result.user).toEqual(createdUser);
       expect(result.token).toBe('jwt-token');

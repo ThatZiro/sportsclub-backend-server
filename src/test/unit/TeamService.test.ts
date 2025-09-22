@@ -308,7 +308,7 @@ describe('TeamService', () => {
         teamId,
         userId,
         approverId,
-        approver
+        { approve: true }
       );
 
       // Assert
@@ -361,7 +361,7 @@ describe('TeamService', () => {
         teamId,
         userId,
         approverId,
-        organizer
+        { approve: true }
       );
 
       // Assert
@@ -392,7 +392,7 @@ describe('TeamService', () => {
 
       // Act & Assert
       await expect(
-        teamService.approveMember(teamId, userId, approverId, regularUser)
+        teamService.approveMember(teamId, userId, approverId, { approve: true })
       ).rejects.toThrow(InsufficientPermissionsError);
     });
 
@@ -421,7 +421,7 @@ describe('TeamService', () => {
 
       // Act & Assert
       await expect(
-        teamService.approveMember(teamId, userId, approverId, captain)
+        teamService.approveMember(teamId, userId, approverId, { approve: true })
       ).rejects.toThrow(TeamMembershipError);
     });
   });

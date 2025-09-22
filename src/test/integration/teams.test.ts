@@ -12,6 +12,11 @@ import {
   seedTestData,
 } from '../database';
 
+// Helper function to extract cookies safely
+const getCookies = (response: any): string[] => {
+  return response.headers['set-cookie'] as string[] || [];
+};
+
 describe('Team Management Integration Tests', () => {
   let testData: any;
 
@@ -36,7 +41,7 @@ describe('Team Management Integration Tests', () => {
         password: 'password123',
       });
 
-      const cookies = loginResponse.headers['set-cookie'];
+      const cookies = loginResponse.headers['set-cookie'] as string[];
 
       const teamData = {
         name: 'New Team',
@@ -78,7 +83,7 @@ describe('Team Management Integration Tests', () => {
         password: 'password123',
       });
 
-      const cookies = loginResponse.headers['set-cookie'];
+      const cookies = loginResponse.headers['set-cookie'] as string[];
 
       const response = await request(app)
         .post('/teams')
@@ -98,7 +103,7 @@ describe('Team Management Integration Tests', () => {
         password: 'password123',
       });
 
-      const cookies = loginResponse.headers['set-cookie'];
+      const cookies = loginResponse.headers['set-cookie'] as string[];
 
       const response = await request(app)
         .post('/teams')
@@ -121,7 +126,7 @@ describe('Team Management Integration Tests', () => {
         password: 'password123',
       });
 
-      const cookies = loginResponse.headers['set-cookie'];
+      const cookies = loginResponse.headers['set-cookie'] as string[];
 
       const response = await request(app)
         .get(`/teams/${testData.team.id}`)
@@ -147,7 +152,7 @@ describe('Team Management Integration Tests', () => {
         password: 'password123',
       });
 
-      const cookies = loginResponse.headers['set-cookie'];
+      const cookies = loginResponse.headers['set-cookie'] as string[];
 
       await request(app)
         .get('/teams/non-existent-id')
@@ -170,7 +175,7 @@ describe('Team Management Integration Tests', () => {
         password: 'password123',
       });
 
-      const cookies = loginResponse.headers['set-cookie'];
+      const cookies = loginResponse.headers['set-cookie'] as string[];
 
       const response = await request(app)
         .post(`/teams/${testData.team.id}/join`)
@@ -193,7 +198,7 @@ describe('Team Management Integration Tests', () => {
         password: 'password123',
       });
 
-      const cookies = loginResponse.headers['set-cookie'];
+      const cookies = loginResponse.headers['set-cookie'] as string[];
 
       const response = await request(app)
         .post(`/teams/${testData.team.id}/join`)
@@ -210,7 +215,7 @@ describe('Team Management Integration Tests', () => {
         password: 'password123',
       });
 
-      const cookies = loginResponse.headers['set-cookie'];
+      const cookies = loginResponse.headers['set-cookie'] as string[];
 
       await request(app)
         .post('/teams/non-existent-id/join')
@@ -226,7 +231,7 @@ describe('Team Management Integration Tests', () => {
         password: 'password123',
       });
 
-      const cookies = loginResponse.headers['set-cookie'];
+      const cookies = loginResponse.headers['set-cookie'] as string[];
 
       const response = await request(app)
         .post(
@@ -251,7 +256,7 @@ describe('Team Management Integration Tests', () => {
         password: 'password123',
       });
 
-      const cookies = loginResponse.headers['set-cookie'];
+      const cookies = loginResponse.headers['set-cookie'] as string[];
 
       const response = await request(app)
         .post(
@@ -269,7 +274,7 @@ describe('Team Management Integration Tests', () => {
         password: 'password123',
       });
 
-      const cookies = loginResponse.headers['set-cookie'];
+      const cookies = loginResponse.headers['set-cookie'] as string[];
 
       const response = await request(app)
         .post(
@@ -303,7 +308,7 @@ describe('Team Management Integration Tests', () => {
         password: 'password123',
       });
 
-      const captainCookies = captainLogin.headers['set-cookie'];
+      const captainCookies = captainLogin.headers['set-cookie'] as string[];
 
       const teamResponse = await request(app)
         .post('/teams')
@@ -323,7 +328,7 @@ describe('Team Management Integration Tests', () => {
         password: 'password123',
       });
 
-      const memberCookies = memberLogin.headers['set-cookie'];
+      const memberCookies = memberLogin.headers['set-cookie'] as string[];
 
       await request(app)
         .post(`/teams/${teamId}/join`)

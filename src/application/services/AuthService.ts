@@ -50,6 +50,14 @@ export class AuthService {
    * Requirements: 1.1, 1.2, 1.3, 11.2
    */
   async signup(userData: SignupDTO): Promise<AuthResult> {
+    // Basic validation
+    if (!userData.email || !userData.email.includes('@')) {
+      throw new ValidationError('Invalid email format');
+    }
+    if (!userData.password || userData.password.length < 6) {
+      throw new ValidationError('Password must be at least 6 characters');
+    }
+
     // Check if user already exists
     const existingUser = await this.userRepository.findByEmail(userData.email);
     if (existingUser) {

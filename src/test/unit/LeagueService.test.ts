@@ -26,7 +26,14 @@ describe('LeagueService', () => {
       findAll: jest.fn(),
       findActive: jest.fn(),
     };
-    leagueService = new LeagueService(mockLeagueRepo);
+    const mockUserRepo = {
+      findById: jest.fn(),
+      findByEmail: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    };
+    leagueService = new LeagueService(mockLeagueRepo, mockUserRepo);
   });
 
   describe('getLeagueBySlug', () => {
@@ -87,7 +94,7 @@ describe('LeagueService', () => {
       mockLeagueRepo.create.mockResolvedValue(createdLeague);
 
       // Act
-      const result = await leagueService.createLeague(leagueData);
+      const result = await leagueService.createLeague(leagueData, 'user-id');
 
       // Assert
       expect(mockLeagueRepo.findBySlug).toHaveBeenCalledWith('new-league');
@@ -113,7 +120,7 @@ describe('LeagueService', () => {
       mockLeagueRepo.findBySlug.mockResolvedValue(existingLeague);
 
       // Act & Assert
-      await expect(leagueService.createLeague(leagueData)).rejects.toThrow(
+      await expect(leagueService.createLeague(leagueData, 'user-id')).rejects.toThrow(
         DuplicateLeagueSlugError
       );
     });
@@ -123,7 +130,7 @@ describe('LeagueService', () => {
       const invalidData = { ...leagueData, name: 'A' }; // Too short
 
       // Act & Assert
-      await expect(leagueService.createLeague(invalidData)).rejects.toThrow(
+      await expect(leagueService.createLeague(invalidData, 'user-id')).rejects.toThrow(
         LeagueValidationError
       );
     });
@@ -160,7 +167,7 @@ describe('LeagueService', () => {
       mockLeagueRepo.update.mockResolvedValue(updatedLeague);
 
       // Act
-      const result = await leagueService.updateLeague(leagueId, updates);
+      const result = await leagueService.updateLeague(leagueId, updates, 'user-id');
 
       // Assert
       expect(mockLeagueRepo.findById).toHaveBeenCalledWith(leagueId);
@@ -178,7 +185,7 @@ describe('LeagueService', () => {
 
       // Act & Assert
       await expect(
-        leagueService.updateLeague(leagueId, updates)
+        leagueService.updateLeague(leagueId, updates, 'user-id')
       ).rejects.toThrow(LeagueNotFoundError);
     });
   });
@@ -201,7 +208,7 @@ describe('LeagueService', () => {
       mockLeagueRepo.delete.mockResolvedValue(undefined);
 
       // Act
-      await leagueService.deleteLeague(leagueId);
+      await leagueService.deleteLeague(leagueId, 'user-id');
 
       // Assert
       expect(mockLeagueRepo.findById).toHaveBeenCalledWith(leagueId);
@@ -213,7 +220,7 @@ describe('LeagueService', () => {
       mockLeagueRepo.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(leagueService.deleteLeague(leagueId)).rejects.toThrow(
+      await expect(leagueService.deleteLeague(leagueId, 'user-id')).rejects.toThrow(
         LeagueNotFoundError
       );
     });
