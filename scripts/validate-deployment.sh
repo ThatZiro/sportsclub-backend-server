@@ -1,177 +1,223 @@
 #!/bin/bash
 
-# Deployment Validation Script
-# This script validates that all necessary files and configurations are in place for deployment
+# Deployment Validation Script for PBSportsClub API
+# This script validates that the application is ready for deployment
 
 set -e
 
-echo "🔍 Validating deployment configuration..."
+echo "🔍 Starting deployment validation..."
+echo "=================================="
 
-# Check required files
-REQUIRED_FILES=(
-    "package.json"
-    "Dockerfile"
-    "docker-compose.yml"
-    "prisma/schema.prisma"
-    ".github/workflows/deploy.yml"
-    "scripts/deploy.sh"
-    "scripts/health-check.sh"
-)
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
 
-echo "📁 Checking required files..."
-for file in "${REQUIRED_FILES[@]}"; do
-    if [ -f "$file" ]; then
-        echo "✅ $file"
+# Track validation results
+VALIDATION_ERRORS=0
+
+# Function to print success message
+print_success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+# Function to print error message
+print_error() {
+    echo -e "${RED}❌ $1${NC}"
+    VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+}
+
+# Function to print warning message
+print_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+echo "1. Checking Node.js and npm..."
+if command -v node &> /dev/null; then
+    NODE_VERSION=$(node --version)
+    print_success "Node.js is installed: $NODE_VERSION"
+    
+    if [[ "$NODE_VERSION" =~ ^v1[8-9]\. ]] || [[ "$NODE_VERSION" =~ ^v[2-9][0-9]\. ]]; then
+        print_success "Node.js version is compatible (18+)"
     else
-        echo "❌ $file - MISSING"
-        exit 1
-    fi
-done
-
-# Check if scripts are executable
-echo "🔧 Checking script permissions..."
-if [ -x "scripts/deploy.sh" ]; then
-    echo "✅ scripts/deploy.sh is executable"
-else
-    echo "⚠️  Making scripts/deploy.sh executable"
-    chmod +x scripts/deploy.sh
-fi
-
-if [ -x "scripts/health-check.sh" ]; then
-    echo "✅ scripts/health-check.sh is executable"
-else
-    echo "⚠️  Making scripts/health-check.sh executable"
-    chmod +x scripts/health-check.sh
-fi
-
-# Validate package.json scripts
-echo "📦 Checking package.json scripts..."
-REQUIRED_SCRIPTS=("build" "start" "test" "lint")
-for script in "${REQUIRED_SCRIPTS[@]}"; do
-    if npm run | grep -q "^  $script$"; then
-        echo "✅ npm run $script"
-    else
-        echo "❌ npm run $script - MISSING"
-        exit 1
-    fi
-done
-
-# Check Docker configuration
-echo "🐳 Validating Docker configuration..."
-if docker --version > /dev/null 2>&1; then
-    echo "✅ Docker is available"
-else
-    echo "⚠️  Docker not found (this is okay for CI/CD validation)"
-fi
-
-# Validate docker-compose.yml syntax
-if command -v docker-compose > /dev/null 2>&1; then
-    if docker-compose config > /dev/null 2>&1; then
-        echo "✅ docker-compose.yml syntax is valid"
-    else
-        echo "❌ docker-compose.yml has syntax errors"
-        exit 1
+        print_error "Node.js version should be 18 or higher, found: $NODE_VERSION"
     fi
 else
-    echo "⚠️  docker-compose not found (this is okay for CI/CD validation)"
+    print_error "Node.js is not installed"
 fi
 
-# Check environment file template
-echo "🔐 Checking environment configuration..."
+if command -v npm &> /dev/null; then
+    NPM_VERSION=$(npm --version)
+    print_success "npm is installed: $NPM_VERSION"
+else
+    print_error "npm is not installed"
+fi
+
+echo ""
+echo "2. Checking project dependencies..."
+if [ -f "package.json" ]; then
+    print_success "package.json exists"
+else
+    print_error "package.json not found"
+fi
+
+if [ -f "package-lock.json" ]; then
+    print_success "package-lock.json exists"
+else
+    print_warning "package-lock.json not found - consider running 'npm install'"
+fi
+
+if [ -d "node_modules" ]; then
+    print_success "node_modules directory exists"
+else
+    print_warning "node_modules not found - run 'npm install' first"
+fi
+
+echo ""
+echo "3. Checking environment configuration..."
 if [ -f ".env.example" ]; then
-    echo "✅ .env.example exists"
+    print_success ".env.example exists"
+else
+    print_error ".env.example not found"
+fi
+
+if [ -f ".env" ]; then
+    print_success ".env file exists"
     
     # Check for required environment variables
-    REQUIRED_ENV_VARS=("DATABASE_URL" "JWT_SECRET" "NODE_ENV")
-    for var in "${REQUIRED_ENV_VARS[@]}"; do
-        if grep -q "^$var=" .env.example; then
-            echo "✅ $var in .env.example"
+    required_vars=("DATABASE_URL" "JWT_SECRET" "LEAGUE_SLUG")
+    for var in "${required_vars[@]}"; do
+        if grep -q "^$var=" .env; then
+            print_success "$var is configured in .env"
         else
-            echo "❌ $var missing from .env.example"
-            exit 1
+            print_warning "$var not found in .env file"
         fi
     done
 else
-    echo "❌ .env.example - MISSING"
-    exit 1
+    print_warning ".env file not found - copy from .env.example and configure"
 fi
 
-# Validate GitHub Actions workflow
-echo "🚀 Validating GitHub Actions workflow..."
-if [ -f ".github/workflows/deploy.yml" ]; then
-    # Check for required secrets in workflow
-    REQUIRED_SECRETS=("EC2_HOST" "EC2_USER" "EC2_SSH_KEY" "DATABASE_URL" "JWT_SECRET")
-    for secret in "${REQUIRED_SECRETS[@]}"; do
-        if grep -q "\${{ secrets\.$secret }}" .github/workflows/deploy.yml; then
-            echo "✅ $secret secret referenced in workflow"
-        else
-            echo "❌ $secret secret missing from workflow"
-            exit 1
-        fi
-    done
-else
-    echo "❌ GitHub Actions workflow missing"
-    exit 1
-fi
-
-# Check Prisma configuration
-echo "🗄️  Validating Prisma configuration..."
+echo ""
+echo "4. Checking Prisma configuration..."
 if [ -f "prisma/schema.prisma" ]; then
-    echo "✅ Prisma schema exists"
-    
-    # Check if migrations directory exists
-    if [ -d "prisma/migrations" ]; then
-        echo "✅ Prisma migrations directory exists"
+    print_success "Prisma schema exists"
+else
+    print_error "Prisma schema not found"
+fi
+
+if [ -d "prisma/migrations" ]; then
+    migration_count=$(find prisma/migrations -name "*.sql" | wc -l)
+    if [ "$migration_count" -gt 0 ]; then
+        print_success "Database migrations exist ($migration_count files)"
     else
-        echo "⚠️  No migrations found (this might be okay for initial setup)"
+        print_warning "No migration files found"
     fi
 else
-    echo "❌ Prisma schema missing"
-    exit 1
+    print_warning "Migrations directory not found"
 fi
 
-# Validate TypeScript configuration
-echo "📝 Checking TypeScript configuration..."
-if [ -f "tsconfig.json" ]; then
-    echo "✅ tsconfig.json exists"
+echo ""
+echo "5. Checking Docker configuration..."
+if [ -f "Dockerfile" ]; then
+    print_success "Dockerfile exists"
 else
-    echo "❌ tsconfig.json missing"
-    exit 1
+    print_error "Dockerfile not found"
 fi
 
-# Check if build directory structure is correct
-echo "🏗️  Validating build configuration..."
-if npm run build > /dev/null 2>&1; then
-    if [ -d "dist" ]; then
-        echo "✅ Build creates dist directory"
-        if [ -f "dist/index.js" ]; then
-            echo "✅ Main entry point exists in build output"
+if [ -f "docker-compose.yml" ]; then
+    print_success "docker-compose.yml exists"
+else
+    print_error "docker-compose.yml not found"
+fi
+
+if command -v docker &> /dev/null; then
+    DOCKER_VERSION=$(docker --version)
+    print_success "Docker is installed: $DOCKER_VERSION"
+else
+    print_warning "Docker not installed (required for deployment)"
+fi
+
+if command -v docker-compose &> /dev/null; then
+    COMPOSE_VERSION=$(docker-compose --version)
+    print_success "Docker Compose is installed: $COMPOSE_VERSION"
+else
+    print_warning "Docker Compose not installed (required for deployment)"
+fi
+
+echo ""
+echo "6. Checking deployment scripts..."
+deployment_scripts=("scripts/deploy.sh" "scripts/health-check.sh")
+for script in "${deployment_scripts[@]}"; do
+    if [ -f "$script" ]; then
+        if [ -x "$script" ]; then
+            print_success "$script exists and is executable"
         else
-            echo "❌ Main entry point missing from build output"
-            exit 1
+            print_warning "$script exists but is not executable - run 'chmod +x $script'"
         fi
     else
-        echo "❌ Build does not create dist directory"
-        exit 1
+        print_error "$script not found"
     fi
+done
+
+echo ""
+echo "7. Running code quality checks..."
+
+# Check if we can build the project
+if [ -d "node_modules" ]; then
+    echo "Running TypeScript compilation..."
+    if npm run build > /dev/null 2>&1; then
+        print_success "TypeScript compilation successful"
+    else
+        print_error "TypeScript compilation failed - run 'npm run build' for details"
+    fi
+    
+    echo "Running linting..."
+    if npm run lint > /dev/null 2>&1; then
+        print_success "Linting passed"
+    else
+        print_warning "Linting issues found - run 'npm run lint' for details"
+    fi
+    
+    echo "Checking test configuration..."
+    if [ -f "jest.config.js" ] || [ -f "jest.config.ts" ]; then
+        print_success "Jest configuration found"
+    else
+        print_warning "Jest configuration not found"
+    fi
+    
+    # Don't run tests here as they might require database setup
+    print_warning "Tests not run in validation - run 'npm test' separately"
 else
-    echo "❌ Build command failed"
-    exit 1
+    print_warning "Skipping build checks - install dependencies first"
 fi
 
-# Summary
 echo ""
-echo "🎉 Deployment validation completed successfully!"
+echo "8. Checking GitHub Actions configuration..."
+if [ -f ".github/workflows/deploy.yml" ]; then
+    print_success "GitHub Actions workflow exists"
+else
+    print_error "GitHub Actions workflow not found"
+fi
+
 echo ""
-echo "📋 Next steps for deployment:"
-echo "1. Set up AWS EC2 instance with Ubuntu"
-echo "2. Configure GitHub repository secrets:"
-echo "   - EC2_HOST (your EC2 public IP)"
-echo "   - EC2_USER (usually 'ubuntu')"
-echo "   - EC2_SSH_KEY (private SSH key content)"
-echo "   - DATABASE_URL (PostgreSQL connection string)"
-echo "   - JWT_SECRET (secure random string)"
-echo "   - LEAGUE_SLUG (default league identifier)"
-echo "3. Push to main branch to trigger deployment"
-echo ""
-echo "📖 See DEPLOYMENT.md for detailed setup instructions"
+echo "=================================="
+echo "🏁 Validation Summary"
+echo "=================================="
+
+if [ $VALIDATION_ERRORS -eq 0 ]; then
+    print_success "All critical validations passed! ✨"
+    echo ""
+    echo "Your project is ready for deployment. Next steps:"
+    echo "1. Set up AWS EC2 instance"
+    echo "2. Configure GitHub secrets"
+    echo "3. Push to main branch to trigger deployment"
+    echo ""
+    exit 0
+else
+    print_error "Found $VALIDATION_ERRORS critical issues that need to be resolved"
+    echo ""
+    echo "Please fix the errors above before deploying."
+    echo ""
+    exit 1
+fi

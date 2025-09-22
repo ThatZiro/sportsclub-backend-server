@@ -7,7 +7,7 @@
 export {
   authMiddleware,
   optionalAuthMiddleware,
-  AuthenticatedRequest
+  AuthenticatedRequest,
 } from './auth';
 
 // Authorization middleware
@@ -16,7 +16,7 @@ export {
   requireOrganizer,
   requireAdmin,
   requireCaptainOrOrganizer,
-  requireOwnerOrOrganizer
+  requireOwnerOrOrganizer,
 } from './authorization';
 
 // Rate limiting middleware
@@ -24,7 +24,7 @@ export {
   authRateLimiter,
   apiRateLimiter,
   strictRateLimiter,
-  createRateLimiter
+  createRateLimiter,
 } from './rateLimiter';
 
 // Validation middleware
@@ -32,7 +32,7 @@ export {
   validate,
   validateBody,
   validateParams,
-  validateQuery
+  validateQuery,
 } from './validation';
 
 // Error handling middleware
@@ -44,11 +44,8 @@ export {
   AuthenticationError,
   AuthorizationError,
   NotFoundError,
-  ConflictError
+  ConflictError,
 } from './errorHandler';
 
 // Request logging middleware
-export {
-  requestLogger,
-  requestId
-} from './requestLogger';
+export { requestLogger, requestId } from './requestLogger';

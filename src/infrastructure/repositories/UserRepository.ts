@@ -9,7 +9,7 @@ import {
   User,
   CreateUserData,
   UpdateUserData,
-  UserDomain
+  UserDomain,
 } from '../../domain/entities';
 import { UserRole } from '../../domain/enums';
 
@@ -29,8 +29,8 @@ export class UserRepository implements IUserRepository {
         email: data.email,
         passwordHash: data.passwordHash,
         name: data.name,
-        role: data.role || UserRole.USER
-      }
+        role: data.role || UserRole.USER,
+      },
     });
 
     return this.mapPrismaUserToEntity(user);
@@ -41,7 +41,7 @@ export class UserRepository implements IUserRepository {
    */
   async findById(id: string): Promise<User | null> {
     const user = await prisma.user.findUnique({
-      where: { id }
+      where: { id },
     });
 
     return user ? this.mapPrismaUserToEntity(user) : null;
@@ -52,7 +52,7 @@ export class UserRepository implements IUserRepository {
    */
   async findByEmail(email: string): Promise<User | null> {
     const user = await prisma.user.findUnique({
-      where: { email }
+      where: { email },
     });
 
     return user ? this.mapPrismaUserToEntity(user) : null;
@@ -73,8 +73,8 @@ export class UserRepository implements IUserRepository {
       data: {
         ...(data.email && { email: data.email }),
         ...(data.name && { name: data.name }),
-        ...(data.role && { role: data.role })
-      }
+        ...(data.role && { role: data.role }),
+      },
     });
 
     return this.mapPrismaUserToEntity(user);
@@ -85,7 +85,7 @@ export class UserRepository implements IUserRepository {
    */
   async delete(id: string): Promise<void> {
     await prisma.user.delete({
-      where: { id }
+      where: { id },
     });
   }
 
@@ -94,7 +94,7 @@ export class UserRepository implements IUserRepository {
    */
   async findAll(): Promise<User[]> {
     const users = await prisma.user.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
     return users.map(user => this.mapPrismaUserToEntity(user));
@@ -111,7 +111,7 @@ export class UserRepository implements IUserRepository {
       name: prismaUser.name,
       role: prismaUser.role as UserRole,
       createdAt: prismaUser.createdAt,
-      updatedAt: prismaUser.updatedAt
+      updatedAt: prismaUser.updatedAt,
     };
   }
 }

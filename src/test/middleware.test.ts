@@ -9,15 +9,15 @@ import {
   validate,
   ValidationError,
   errorHandler,
-  AuthenticatedRequest
+  AuthenticatedRequest,
 } from '../api/middleware';
 import { signupSchema } from '../api/validators';
 
 // Mock UserRepository
 jest.mock('../infrastructure/repositories', () => ({
   UserRepository: jest.fn().mockImplementation(() => ({
-    findById: jest.fn()
-  }))
+    findById: jest.fn(),
+  })),
 }));
 
 describe('Middleware Tests', () => {
@@ -31,11 +31,11 @@ describe('Middleware Tests', () => {
       cookies: {},
       body: {},
       params: {},
-      query: {}
+      query: {},
     };
     res = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn().mockReturnThis()
+      json: jest.fn().mockReturnThis(),
     };
     next = jest.fn();
 
@@ -46,7 +46,7 @@ describe('Middleware Tests', () => {
       name: 'Test User',
       role: UserRole.USER,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     // Set up environment variable
@@ -68,7 +68,7 @@ describe('Middleware Tests', () => {
       const { UserRepository } = require('../infrastructure/repositories');
       const mockFindById = jest.fn().mockResolvedValue(mockUser);
       UserRepository.mockImplementation(() => ({
-        findById: mockFindById
+        findById: mockFindById,
       }));
 
       await authMiddleware(req as AuthenticatedRequest, res as Response, next);
@@ -86,7 +86,7 @@ describe('Middleware Tests', () => {
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({
         error: 'Authentication required',
-        message: 'No authentication token provided'
+        message: 'No authentication token provided',
       });
       expect(next).not.toHaveBeenCalled();
     });
@@ -99,14 +99,18 @@ describe('Middleware Tests', () => {
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({
         error: 'Authentication failed',
-        message: 'Invalid token'
+        message: 'Invalid token',
       });
       expect(next).not.toHaveBeenCalled();
     });
 
     it('should return 401 when user not found', async () => {
       const token = jwt.sign(
-        { userId: 'nonexistent', email: 'test@example.com', role: UserRole.USER },
+        {
+          userId: 'nonexistent',
+          email: 'test@example.com',
+          role: UserRole.USER,
+        },
         process.env['JWT_SECRET']!
       );
       req.cookies = { authToken: token };
@@ -114,7 +118,7 @@ describe('Middleware Tests', () => {
       const { UserRepository } = require('../infrastructure/repositories');
       const mockFindById = jest.fn().mockResolvedValue(null);
       UserRepository.mockImplementation(() => ({
-        findById: mockFindById
+        findById: mockFindById,
       }));
 
       await authMiddleware(req as AuthenticatedRequest, res as Response, next);
@@ -122,7 +126,7 @@ describe('Middleware Tests', () => {
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({
         error: 'Authentication failed',
-        message: 'User not found'
+        message: 'User not found',
       });
       expect(next).not.toHaveBeenCalled();
     });
@@ -147,7 +151,7 @@ describe('Middleware Tests', () => {
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({
         error: 'Insufficient permissions',
-        message: 'Access denied. Required role: ORGANIZER'
+        message: 'Access denied. Required role: ORGANIZER',
       });
       expect(next).not.toHaveBeenCalled();
     });
@@ -161,7 +165,7 @@ describe('Middleware Tests', () => {
       expect(res.status).toHaveBeenCalledWith(401);
       expect(res.json).toHaveBeenCalledWith({
         error: 'Authentication required',
-        message: 'User must be authenticated to access this resource'
+        message: 'User must be authenticated to access this resource',
       });
       expect(next).not.toHaveBeenCalled();
     });
@@ -192,7 +196,7 @@ describe('Middleware Tests', () => {
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.json).toHaveBeenCalledWith({
         error: 'Insufficient permissions',
-        message: 'Organizer privileges required'
+        message: 'Organizer privileges required',
       });
       expect(next).not.toHaveBeenCalled();
     });
@@ -203,7 +207,7 @@ describe('Middleware Tests', () => {
       req.body = {
         name: 'John Doe',
         email: 'JOHN@EXAMPLE.COM',
-        password: 'password123'
+        password: 'password123',
       };
 
       const middleware = validate(signupSchema);
@@ -217,7 +221,7 @@ describe('Middleware Tests', () => {
       req.body = {
         name: 'J', // Too short
         email: 'invalid-email',
-        password: '123' // Too short and no letters
+        password: '123', // Too short and no letters
       };
 
       const middleware = validate(signupSchema);
@@ -231,17 +235,17 @@ describe('Middleware Tests', () => {
           details: expect.arrayContaining([
             expect.objectContaining({
               field: expect.stringContaining('name'),
-              message: expect.stringContaining('at least 2 characters')
+              message: expect.stringContaining('at least 2 characters'),
             }),
             expect.objectContaining({
               field: expect.stringContaining('email'),
-              message: expect.stringContaining('Invalid email format')
+              message: expect.stringContaining('Invalid email format'),
             }),
             expect.objectContaining({
               field: expect.stringContaining('password'),
-              message: expect.stringContaining('at least 8 characters')
-            })
-          ])
+              message: expect.stringContaining('at least 8 characters'),
+            }),
+          ]),
         })
       );
       expect(next).not.toHaveBeenCalled();
@@ -257,7 +261,7 @@ describe('Middleware Tests', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith({
         error: 'Bad Request',
-        message: 'Test validation error'
+        message: 'Test validation error',
       });
     });
 
@@ -269,7 +273,7 @@ describe('Middleware Tests', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         error: 'Internal Server Error',
-        message: 'Internal server error'
+        message: 'Internal server error',
       });
     });
 
@@ -283,8 +287,8 @@ describe('Middleware Tests', () => {
         expect.objectContaining({
           details: expect.objectContaining({
             stack: expect.any(String),
-            originalError: 'Test error'
-          })
+            originalError: 'Test error',
+          }),
         })
       );
 

@@ -3,7 +3,11 @@
  * Tests user service with mocked dependencies
  */
 
-import { UserService, UserNotFoundError, UserValidationError, DuplicateEmailError } from '../../application/services/UserService';
+import {
+  UserService,
+  UserNotFoundError,
+  DuplicateEmailError,
+} from '../../application/services/UserService';
 import { IUserRepository } from '../../infrastructure/repositories/interfaces';
 import { UserRole } from '../../domain/enums';
 
@@ -19,7 +23,7 @@ describe('UserService', () => {
       findByEmail: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      findAll: jest.fn()
+      findAll: jest.fn(),
     };
     userService = new UserService(mockUserRepo);
   });
@@ -35,7 +39,7 @@ describe('UserService', () => {
         name: 'Test User',
         role: UserRole.USER,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockUserRepo.findById.mockResolvedValue(user);
@@ -54,8 +58,9 @@ describe('UserService', () => {
       mockUserRepo.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(userService.getUserProfile(userId))
-        .rejects.toThrow(UserNotFoundError);
+      await expect(userService.getUserProfile(userId)).rejects.toThrow(
+        UserNotFoundError
+      );
     });
   });
 
@@ -68,20 +73,20 @@ describe('UserService', () => {
       name: 'Test User',
       role: UserRole.USER,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     it('should update user profile successfully', async () => {
       // Arrange
       const updates = {
         name: 'Updated Name',
-        email: 'updated@example.com'
+        email: 'updated@example.com',
       };
 
       const updatedUser = {
         ...existingUser,
         ...updates,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockUserRepo.findById.mockResolvedValue(existingUser);
@@ -104,8 +109,9 @@ describe('UserService', () => {
       mockUserRepo.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(userService.updateUserProfile(userId, updates))
-        .rejects.toThrow(UserNotFoundError);
+      await expect(
+        userService.updateUserProfile(userId, updates)
+      ).rejects.toThrow(UserNotFoundError);
     });
 
     it('should throw error if email already exists', async () => {
@@ -118,15 +124,16 @@ describe('UserService', () => {
         name: 'Other User',
         role: UserRole.USER,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockUserRepo.findById.mockResolvedValue(existingUser);
       mockUserRepo.findByEmail.mockResolvedValue(otherUser);
 
       // Act & Assert
-      await expect(userService.updateUserProfile(userId, updates))
-        .rejects.toThrow(DuplicateEmailError);
+      await expect(
+        userService.updateUserProfile(userId, updates)
+      ).rejects.toThrow(DuplicateEmailError);
     });
 
     it('should allow updating to same email', async () => {
@@ -135,7 +142,7 @@ describe('UserService', () => {
       const updatedUser = {
         ...existingUser,
         ...updates,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockUserRepo.findById.mockResolvedValue(existingUser);

@@ -17,16 +17,16 @@ function validatePrismaSchema(): boolean {
       'generator client',
       'datasource db',
       'model User',
-      'model League', 
+      'model League',
       'model Team',
       'model TeamMember',
       'enum UserRole',
       'enum MemberRole',
-      'enum MemberStatus'
+      'enum MemberStatus',
     ];
 
-    const missingSection = requiredSections.find(section => 
-      !schemaContent.includes(section)
+    const missingSection = requiredSections.find(
+      section => !schemaContent.includes(section)
     );
 
     if (missingSection) {
@@ -42,9 +42,14 @@ function validatePrismaSchema(): boolean {
     }
 
     const userModel = userModelMatch[1];
+    if (!userModel) {
+      console.error('❌ User model content not found');
+      return false;
+    }
+
     const requiredUserFields = ['id', 'email', 'passwordHash', 'name', 'role'];
-    const missingUserField = requiredUserFields.find(field => 
-      !userModel.includes(field)
+    const missingUserField = requiredUserFields.find(
+      field => !userModel.includes(field)
     );
 
     if (missingUserField) {
@@ -79,7 +84,6 @@ function validatePrismaSchema(): boolean {
     console.log('  - Unique constraints for data integrity');
 
     return true;
-
   } catch (error) {
     console.error('❌ Schema validation failed:', error);
     return false;

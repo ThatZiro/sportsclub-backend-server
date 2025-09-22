@@ -57,7 +57,9 @@ export class UserDomain {
    */
   static isValidPassword(password: string): boolean {
     // At least 8 characters, contains letter and number
-    return password.length >= 8 && /[A-Za-z]/.test(password) && /\d/.test(password);
+    return (
+      password.length >= 8 && /[A-Za-z]/.test(password) && /\d/.test(password)
+    );
   }
 
   /**
@@ -116,7 +118,7 @@ export class UserDomain {
    * Creates a safe user object (without password hash)
    */
   static toSafeUser(user: User): Omit<User, 'passwordHash'> {
-    const { passwordHash, ...safeUser } = user;
+    const { passwordHash: _passwordHash, ...safeUser } = user;
     return safeUser;
   }
 }

@@ -4,12 +4,7 @@
  */
 
 // Auth validators
-export {
-  signupSchema,
-  loginSchema,
-  SignupRequest,
-  LoginRequest
-} from './auth';
+export { signupSchema, loginSchema, SignupRequest, LoginRequest } from './auth';
 
 // User validators
 export {
@@ -18,7 +13,7 @@ export {
   userIdParamSchema,
   UpdateUserProfileRequest,
   UpdateUserRoleRequest,
-  UserIdParamRequest
+  UserIdParamRequest,
 } from './user';
 
 // League validators
@@ -30,7 +25,7 @@ export {
   CreateLeagueRequest,
   UpdateLeagueRequest,
   LeagueIdParamRequest,
-  LeagueSlugParamRequest
+  LeagueSlugParamRequest,
 } from './league';
 
 // Team validators
@@ -46,5 +41,5 @@ export {
   TeamIdParamRequest,
   JoinTeamRequest,
   ApproveMemberRequest,
-  GetTeamsByLeagueRequest
+  GetTeamsByLeagueRequest,
 } from './team';

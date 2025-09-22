@@ -9,7 +9,7 @@ const execAsync = promisify(exec);
 
 async function runMigrations() {
   console.log('🔄 Running database migrations...');
-  
+
   try {
     // Generate Prisma client
     console.log('📦 Generating Prisma client...');
@@ -19,17 +19,16 @@ async function runMigrations() {
     // Run migrations
     console.log('🗃️  Running database migrations...');
     const { stdout, stderr } = await execAsync('npx prisma migrate deploy');
-    
+
     if (stderr && !stderr.includes('warning')) {
       console.error('❌ Migration error:', stderr);
       throw new Error(stderr);
     }
-    
+
     console.log('✅ Migrations completed successfully');
     if (stdout) {
       console.log(stdout);
     }
-
   } catch (error) {
     console.error('❌ Migration failed:', error);
     process.exit(1);

@@ -9,10 +9,15 @@ import { UserRole, MemberRole, MemberStatus } from '../domain/enums';
 export const testDb = new PrismaClient({
   datasources: {
     db: {
-      url: process.env['DATABASE_URL'] || 'postgresql://test:test@localhost:5432/pbsports_test'
-    }
+      url:
+        process.env['DATABASE_URL'] ||
+        'postgresql://test:test@localhost:5432/pbsports_test',
+    },
   },
-  log: process.env['NODE_ENV'] === 'test' ? [] : ['query', 'info', 'warn', 'error']
+  log:
+    process.env['NODE_ENV'] === 'test'
+      ? []
+      : ['query', 'info', 'warn', 'error'],
 });
 
 /**
@@ -33,15 +38,21 @@ export async function cleanDatabase(): Promise<void> {
 /**
  * Seed the database with test data
  */
-export async function seedTestData() {
+export async function seedTestData(): Promise<{
+  organizer: any;
+  captain: any;
+  player: any;
+  league: any;
+  team: any;
+}> {
   // Create test users
   const organizer = await testDb.user.create({
     data: {
       email: 'organizer@test.com',
       passwordHash: '$2b$12$hashedpassword',
       name: 'Test Organizer',
-      role: UserRole.ORGANIZER
-    }
+      role: UserRole.ORGANIZER,
+    },
   });
 
   const captain = await testDb.user.create({
@@ -49,8 +60,8 @@ export async function seedTestData() {
       email: 'captain@test.com',
       passwordHash: '$2b$12$hashedpassword',
       name: 'Test Captain',
-      role: UserRole.USER
-    }
+      role: UserRole.USER,
+    },
   });
 
   const player = await testDb.user.create({
@@ -58,8 +69,8 @@ export async function seedTestData() {
       email: 'player@test.com',
       passwordHash: '$2b$12$hashedpassword',
       name: 'Test Player',
-      role: UserRole.USER
-    }
+      role: UserRole.USER,
+    },
   });
 
   // Create test league
@@ -68,8 +79,8 @@ export async function seedTestData() {
       name: 'Test League',
       slug: 'test-league',
       season: 'Spring 2024',
-      isActive: true
-    }
+      isActive: true,
+    },
   });
 
   // Create test team
@@ -78,8 +89,8 @@ export async function seedTestData() {
       name: 'Test Team',
       color: '#FF0000',
       leagueId: league.id,
-      captainId: captain.id
-    }
+      captainId: captain.id,
+    },
   });
 
   // Create team memberships
@@ -88,8 +99,8 @@ export async function seedTestData() {
       teamId: team.id,
       userId: captain.id,
       role: MemberRole.CAPTAIN,
-      status: MemberStatus.APPROVED
-    }
+      status: MemberStatus.APPROVED,
+    },
   });
 
   await testDb.teamMember.create({
@@ -97,8 +108,8 @@ export async function seedTestData() {
       teamId: team.id,
       userId: player.id,
       role: MemberRole.MEMBER,
-      status: MemberStatus.PENDING
-    }
+      status: MemberStatus.PENDING,
+    },
   });
 
   return {
@@ -106,7 +117,7 @@ export async function seedTestData() {
     captain,
     player,
     league,
-    team
+    team,
   };
 }
 

@@ -27,13 +27,13 @@ async function validateDocker(): Promise<void> {
     results.push({
       name: 'Docker Installation',
       status: 'pass',
-      message: 'Docker is installed and accessible'
+      message: 'Docker is installed and accessible',
     });
   } catch (error) {
     results.push({
       name: 'Docker Installation',
       status: 'fail',
-      message: 'Docker is not installed or not accessible'
+      message: 'Docker is not installed or not accessible',
     });
   }
 
@@ -47,13 +47,13 @@ async function validateDocker(): Promise<void> {
     results.push({
       name: 'Docker Compose',
       status: 'pass',
-      message: 'Docker Compose is available'
+      message: 'Docker Compose is available',
     });
   } catch (error) {
     results.push({
       name: 'Docker Compose',
       status: 'fail',
-      message: 'Docker Compose is not available'
+      message: 'Docker Compose is not available',
     });
   }
 
@@ -63,29 +63,29 @@ async function validateDocker(): Promise<void> {
     results.push({
       name: 'Docker Daemon',
       status: 'pass',
-      message: 'Docker daemon is running'
+      message: 'Docker daemon is running',
     });
   } catch (error) {
     results.push({
       name: 'Docker Daemon',
       status: 'fail',
-      message: 'Docker daemon is not running'
+      message: 'Docker daemon is not running',
     });
   }
 
   // Test 4: Dockerfile exists and is valid
   try {
-    const { stdout } = await execAsync('docker build --dry-run -f Dockerfile .');
+    await execAsync('docker build --dry-run -f Dockerfile .');
     results.push({
       name: 'Dockerfile Validation',
       status: 'pass',
-      message: 'Dockerfile is valid'
+      message: 'Dockerfile is valid',
     });
   } catch (error) {
     results.push({
       name: 'Dockerfile Validation',
       status: 'fail',
-      message: 'Dockerfile has issues or is missing'
+      message: 'Dockerfile has issues or is missing',
     });
   }
 
@@ -95,13 +95,13 @@ async function validateDocker(): Promise<void> {
     results.push({
       name: 'Docker Compose Config',
       status: 'pass',
-      message: 'docker-compose.yml is valid'
+      message: 'docker-compose.yml is valid',
     });
   } catch (error) {
     results.push({
       name: 'Docker Compose Config',
       status: 'fail',
-      message: 'docker-compose.yml has validation errors'
+      message: 'docker-compose.yml has validation errors',
     });
   }
 
@@ -111,28 +111,31 @@ async function validateDocker(): Promise<void> {
     results.push({
       name: 'Production Environment Template',
       status: 'pass',
-      message: 'Production environment template exists'
+      message: 'Production environment template exists',
     });
   } else {
     results.push({
       name: 'Production Environment Template',
       status: 'warning',
-      message: 'Production environment template is missing'
+      message: 'Production environment template is missing',
     });
   }
 
   // Test 7: Deployment scripts
-  if (fs.existsSync('scripts/deploy.sh') && fs.existsSync('scripts/deploy.ps1')) {
+  if (
+    fs.existsSync('scripts/deploy.sh') &&
+    fs.existsSync('scripts/deploy.ps1')
+  ) {
     results.push({
       name: 'Deployment Scripts',
       status: 'pass',
-      message: 'Deployment scripts are available for both Unix and Windows'
+      message: 'Deployment scripts are available for both Unix and Windows',
     });
   } else {
     results.push({
       name: 'Deployment Scripts',
       status: 'warning',
-      message: 'Some deployment scripts are missing'
+      message: 'Some deployment scripts are missing',
     });
   }
 
@@ -141,27 +144,28 @@ async function validateDocker(): Promise<void> {
     results.push({
       name: 'Database Initialization',
       status: 'pass',
-      message: 'Database initialization script exists'
+      message: 'Database initialization script exists',
     });
   } else {
     results.push({
       name: 'Database Initialization',
       status: 'warning',
-      message: 'Database initialization script is missing'
+      message: 'Database initialization script is missing',
     });
   }
 
   // Display results
   console.log('📋 Validation Results:\n');
-  
+
   let passCount = 0;
   let failCount = 0;
   let warningCount = 0;
 
   results.forEach(result => {
-    const icon = result.status === 'pass' ? '✅' : result.status === 'fail' ? '❌' : '⚠️';
+    const icon =
+      result.status === 'pass' ? '✅' : result.status === 'fail' ? '❌' : '⚠️';
     console.log(`${icon} ${result.name}: ${result.message}`);
-    
+
     if (result.status === 'pass') passCount++;
     else if (result.status === 'fail') failCount++;
     else warningCount++;
@@ -173,7 +177,9 @@ async function validateDocker(): Promise<void> {
   console.log(`  ⚠️  Warnings: ${warningCount}`);
 
   if (failCount > 0) {
-    console.log('\n❌ Docker deployment validation failed. Please fix the issues above.');
+    console.log(
+      '\n❌ Docker deployment validation failed. Please fix the issues above.'
+    );
     process.exit(1);
   } else if (warningCount > 0) {
     console.log('\n⚠️  Docker deployment validation passed with warnings.');
@@ -187,16 +193,18 @@ async function validateDocker(): Promise<void> {
 // Test API health if it's running
 async function testApiHealth(port: number = 3000): Promise<void> {
   return new Promise((resolve, reject) => {
-    const req = http.get(`http://localhost:${port}/health`, (res) => {
+    const req = http.get(`http://localhost:${port}/health`, res => {
       if (res.statusCode === 200) {
         console.log('✅ API health check passed');
         resolve();
       } else {
-        reject(new Error(`API health check failed with status ${res.statusCode}`));
+        reject(
+          new Error(`API health check failed with status ${res.statusCode}`)
+        );
       }
     });
 
-    req.on('error', (error) => {
+    req.on('error', error => {
       reject(error);
     });
 
@@ -209,7 +217,7 @@ async function testApiHealth(port: number = 3000): Promise<void> {
 
 // Run validation if this script is executed directly
 if (require.main === module) {
-  validateDocker().catch((error) => {
+  validateDocker().catch(error => {
     console.error('❌ Validation failed:', error);
     process.exit(1);
   });

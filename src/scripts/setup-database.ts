@@ -46,7 +46,6 @@ async function setupDatabase() {
     console.log('     npm run db:setup');
     console.log('');
     console.log('🎉 Database setup configuration completed successfully!');
-
   } catch (error) {
     console.error('❌ Database setup failed:', error);
     process.exit(1);

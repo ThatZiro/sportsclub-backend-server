@@ -3,7 +3,7 @@
  * Handles user authentication operations including signup, login, logout, and token validation
  */
 
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { IUserRepository } from '../../infrastructure/repositories/interfaces';
 import { SignupDTO, LoginDTO, AuthResult, JWTPayload } from '../dtos/auth.dto';
@@ -30,14 +30,18 @@ export class ValidationError extends Error {
 export class AuthService {
   private readonly saltRounds = 12;
   private readonly jwtSecret: string;
-  private readonly jwtExpiresIn: string;
+  private readonly jwtExpiresIn: string | number; // Remove the undefined possibility
 
   constructor(private userRepository: IUserRepository) {
     this.jwtSecret = process.env['JWT_SECRET'] || 'fallback-secret-key';
-    this.jwtExpiresIn = process.env['JWT_EXPIRES_IN'] || '1h';
-    
+    const raw = process.env['JWT_EXPIRES_IN'] || '1h';
+    // Ensure we always have a value
+    this.jwtExpiresIn = Number.isFinite(Number(raw)) ? Number(raw) : raw;
+
     if (!process.env['JWT_SECRET']) {
-      console.warn('JWT_SECRET not set in environment variables, using fallback');
+      console.warn(
+        'JWT_SECRET not set in environment variables, using fallback'
+      );
     }
   }
 
@@ -60,7 +64,7 @@ export class AuthService {
       name: userData.name,
       email: userData.email,
       passwordHash,
-      role: UserRole.USER
+      role: UserRole.USER,
     };
 
     // Create user
@@ -71,7 +75,7 @@ export class AuthService {
 
     return {
       user,
-      token
+      token,
     };
   }
 
@@ -87,7 +91,10 @@ export class AuthService {
     }
 
     // Verify password
-    const isPasswordValid = await bcrypt.compare(credentials.password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(
+      credentials.password,
+      user.passwordHash
+    );
     if (!isPasswordValid) {
       throw new AuthenticationError('Invalid email or password');
     }
@@ -97,7 +104,7 @@ export class AuthService {
 
     return {
       user,
-      token
+      token,
     };
   }
 
@@ -120,7 +127,7 @@ export class AuthService {
     try {
       // Verify and decode JWT token
       const decoded = jwt.verify(token, this.jwtSecret) as JWTPayload;
-      
+
       // Find user by ID from token
       const user = await this.userRepository.findById(decoded.userId);
       if (!user) {
@@ -147,11 +154,11 @@ export class AuthService {
     const payload: JWTPayload = {
       userId: user.id,
       email: user.email,
-      role: user.role
+      role: user.role,
     };
 
     return jwt.sign(payload, this.jwtSecret, {
-      expiresIn: this.jwtExpiresIn
+      expiresIn: this.jwtExpiresIn as any,
     });
   }
 

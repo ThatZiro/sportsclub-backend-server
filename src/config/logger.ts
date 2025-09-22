@@ -34,14 +34,14 @@ const developmentFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
   winston.format.colorize({ all: true }),
   winston.format.printf(
-    (info) => `${info['timestamp']} ${info.level}: ${info.message}`
-  ),
+    info => `${info['timestamp']} ${info.level}: ${info.message}`
+  )
 );
 
 const productionFormat = winston.format.combine(
   winston.format.timestamp(),
   winston.format.errors({ stack: true }),
-  winston.format.json(),
+  winston.format.json()
 );
 
 // Define transports
@@ -100,7 +100,7 @@ export interface RequestContext {
 // Create request context from Express request
 export const createRequestContext = (req: Request): RequestContext => {
   return {
-    requestId: req.headers['x-request-id'] as string || generateRequestId(),
+    requestId: (req.headers['x-request-id'] as string) || generateRequestId(),
     userId: (req as any).user?.id,
     method: req.method,
     url: req.originalUrl || req.url,
@@ -112,8 +112,10 @@ export const createRequestContext = (req: Request): RequestContext => {
 
 // Generate a simple request ID
 const generateRequestId = (): string => {
-  return Math.random().toString(36).substring(2, 15) + 
-         Math.random().toString(36).substring(2, 15);
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
 };
 
 // Enhanced logger with context support
@@ -187,7 +189,7 @@ export class Logger {
   ): void {
     const context = createRequestContext(req);
     const level = statusCode >= 400 ? 'warn' : 'http';
-    
+
     this.logWithContext(
       level,
       `${req.method} ${req.originalUrl || req.url} - ${statusCode}`,
@@ -200,13 +202,9 @@ export class Logger {
   }
 
   // Log errors with full context
-  public logError(
-    error: Error,
-    req?: Request,
-    additionalContext?: any
-  ): void {
+  public logError(error: Error, req?: Request, additionalContext?: any): void {
     const context = req ? createRequestContext(req) : undefined;
-    
+
     this.error(error.message, context, {
       stack: error.stack,
       name: error.name,

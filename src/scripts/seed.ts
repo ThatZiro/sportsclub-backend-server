@@ -37,7 +37,7 @@ async function main() {
     // Create sample organizer user
     console.log('👤 Creating sample organizer user...');
     const organizerPassword = await bcrypt.hash('organizer123', bcryptRounds);
-    const organizer = await prisma.user.upsert({
+    await prisma.user.upsert({
       where: { email: 'organizer@pbsports.com' },
       update: {
         name: 'League Organizer',
@@ -55,7 +55,7 @@ async function main() {
     // Create sample users
     console.log('👥 Creating sample users...');
     const users = [];
-    
+
     for (let i = 1; i <= 6; i++) {
       const password = await bcrypt.hash(`user${i}123`, bcryptRounds);
       const user = await prisma.user.upsert({
@@ -84,7 +84,13 @@ async function main() {
 
     for (const teamInfo of teamData) {
       const captain = users[teamInfo.captainIndex];
-      
+      if (!captain) {
+        console.warn(
+          `⚠️  Captain not found for team ${teamInfo.name}, skipping...`
+        );
+        continue;
+      }
+
       // Create team
       const team = await prisma.team.upsert({
         where: {
@@ -129,6 +135,12 @@ async function main() {
       const memberStartIndex = teamInfo.captainIndex + 3;
       if (memberStartIndex < users.length) {
         const member = users[memberStartIndex];
+        if (!member) {
+          console.warn(
+            `⚠️  Member not found at index ${memberStartIndex}, skipping...`
+          );
+          continue;
+        }
         await prisma.teamMember.upsert({
           where: {
             unique_team_membership: {
@@ -149,7 +161,9 @@ async function main() {
         });
       }
 
-      console.log(`  ✅ Created team: ${teamInfo.name} (Captain: ${captain.name})`);
+      console.log(
+        `  ✅ Created team: ${teamInfo.name} (Captain: ${captain.name})`
+      );
     }
 
     console.log('🎉 Database seeding completed successfully!');
@@ -159,8 +173,9 @@ async function main() {
     console.log(`  - Teams: ${teamData.length}`);
     console.log('\n🔐 Test Credentials:');
     console.log('  Organizer: organizer@pbsports.com / organizer123');
-    console.log('  Users: user1@example.com / user1123, user2@example.com / user2123, etc.');
-
+    console.log(
+      '  Users: user1@example.com / user1123, user2@example.com / user2123, etc.'
+    );
   } catch (error) {
     console.error('❌ Error during seeding:', error);
     throw error;
@@ -168,7 +183,7 @@ async function main() {
 }
 
 main()
-  .catch((e) => {
+  .catch(e => {
     console.error('❌ Seeding failed:', e);
     process.exit(1);
   })

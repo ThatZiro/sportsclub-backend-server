@@ -4,7 +4,13 @@
  */
 
 import { Router } from 'express';
-import { authRoutes, userRoutes, leagueRoutes, teamRoutes, publicRoutes } from './index';
+import {
+  authRoutes,
+  userRoutes,
+  leagueRoutes,
+  teamRoutes,
+  publicRoutes,
+} from './index';
 
 // Create main router
 const router = Router();
@@ -46,7 +52,7 @@ router.get('/health', (_req, res) => {
   res.status(200).json({
     success: true,
     message: 'API is healthy',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 

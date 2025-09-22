@@ -3,13 +3,20 @@
  * Tests the repository implementations with a test database
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+  afterAll,
+  beforeEach,
+} from '@jest/globals';
 import { prisma } from '../infrastructure/database';
 import {
   UserRepository,
   LeagueRepository,
   TeamRepository,
-  TeamMemberRepository
+  TeamMemberRepository,
 } from '../infrastructure/repositories';
 import { UserRole, MemberRole, MemberStatus } from '../domain/enums';
 
@@ -48,7 +55,7 @@ describe('Repository Integration Tests', () => {
       const userData = {
         email: 'test@example.com',
         passwordHash: 'hashedpassword',
-        name: 'Test User'
+        name: 'Test User',
       };
 
       const user = await userRepo.create(userData);
@@ -69,7 +76,7 @@ describe('Repository Integration Tests', () => {
       const leagueData = {
         name: 'Test League',
         slug: 'test-league',
-        season: 'Spring 2024'
+        season: 'Spring 2024',
       };
 
       const league = await leagueRepo.create(leagueData);
@@ -88,19 +95,19 @@ describe('Repository Integration Tests', () => {
       const user = await userRepo.create({
         email: 'captain@example.com',
         passwordHash: 'hashedpassword',
-        name: 'Captain User'
+        name: 'Captain User',
       });
 
       const league = await leagueRepo.create({
         name: 'Test League',
-        slug: 'test-league'
+        slug: 'test-league',
       });
 
       const teamData = {
         name: 'Test Team',
         color: '#FF0000',
         leagueId: league.id,
-        captainId: user.id
+        captainId: user.id,
       };
 
       const team = await teamRepo.create(teamData);
@@ -119,24 +126,24 @@ describe('Repository Integration Tests', () => {
       const captain = await userRepo.create({
         email: 'captain@example.com',
         passwordHash: 'hashedpassword',
-        name: 'Captain User'
+        name: 'Captain User',
       });
 
       const member = await userRepo.create({
         email: 'member@example.com',
         passwordHash: 'hashedpassword',
-        name: 'Member User'
+        name: 'Member User',
       });
 
       const league = await leagueRepo.create({
         name: 'Test League',
-        slug: 'test-league'
+        slug: 'test-league',
       });
 
       const team = await teamRepo.create({
         name: 'Test Team',
         leagueId: league.id,
-        captainId: captain.id
+        captainId: captain.id,
       });
 
       // Create captain membership
@@ -144,7 +151,7 @@ describe('Repository Integration Tests', () => {
         teamId: team.id,
         userId: captain.id,
         role: MemberRole.CAPTAIN,
-        status: MemberStatus.APPROVED
+        status: MemberStatus.APPROVED,
       });
 
       // Create regular membership
@@ -152,7 +159,7 @@ describe('Repository Integration Tests', () => {
         teamId: team.id,
         userId: member.id,
         role: MemberRole.MEMBER,
-        status: MemberStatus.PENDING
+        status: MemberStatus.PENDING,
       });
 
       expect(captainMember.role).toBe(MemberRole.CAPTAIN);

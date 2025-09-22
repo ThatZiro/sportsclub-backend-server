@@ -10,7 +10,7 @@ import {
   TeamMemberDomain,
   UserRole,
   MemberRole,
-  MemberStatus
+  MemberStatus,
 } from '../domain';
 
 describe('Domain Validation Tests', () => {
@@ -41,9 +41,9 @@ describe('Domain Validation Tests', () => {
         name: 'Test User',
         role: UserRole.ORGANIZER,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
-      
+
       expect(UserDomain.hasOrganizerPrivileges(user)).toBe(true);
     });
   });
@@ -60,7 +60,9 @@ describe('Domain Validation Tests', () => {
     });
 
     test('generates slug from name', () => {
-      expect(LeagueDomain.generateSlug('Spring 2024 League')).toBe('spring-2024-league');
+      expect(LeagueDomain.generateSlug('Spring 2024 League')).toBe(
+        'spring-2024-league'
+      );
       expect(LeagueDomain.generateSlug('Test League!')).toBe('test-league');
     });
   });
@@ -91,7 +93,7 @@ describe('Domain Validation Tests', () => {
         userId: 'user1',
         role: MemberRole.MEMBER,
         status: MemberStatus.APPROVED,
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       expect(TeamMemberDomain.isApproved(member)).toBe(true);
@@ -100,8 +102,11 @@ describe('Domain Validation Tests', () => {
     });
 
     test('creates captain member data correctly', () => {
-      const captainData = TeamMemberDomain.createCaptainMemberData('team1', 'user1');
-      
+      const captainData = TeamMemberDomain.createCaptainMemberData(
+        'team1',
+        'user1'
+      );
+
       expect(captainData.role).toBe(MemberRole.CAPTAIN);
       expect(captainData.status).toBe(MemberStatus.APPROVED);
     });

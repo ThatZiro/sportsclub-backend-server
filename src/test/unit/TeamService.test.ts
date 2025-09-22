@@ -3,15 +3,19 @@
  * Tests team service with mocked dependencies
  */
 
-import { 
-  TeamService, 
-  TeamNotFoundError, 
-  TeamValidationError, 
+import {
+  TeamService,
+  TeamNotFoundError,
   DuplicateTeamNameError,
   TeamMembershipError,
-  InsufficientPermissionsError
+  InsufficientPermissionsError,
 } from '../../application/services/TeamService';
-import { ITeamRepository, ITeamMemberRepository, ILeagueRepository, IUserRepository } from '../../infrastructure/repositories/interfaces';
+import {
+  ITeamRepository,
+  ITeamMemberRepository,
+  ILeagueRepository,
+  IUserRepository,
+} from '../../infrastructure/repositories/interfaces';
 import { UserRole, MemberRole, MemberStatus } from '../../domain/enums';
 
 describe('TeamService', () => {
@@ -31,7 +35,7 @@ describe('TeamService', () => {
       findByCaptainId: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      findByNameAndLeague: jest.fn()
+      findByNameAndLeague: jest.fn(),
     };
     mockMemberRepo = {
       create: jest.fn(),
@@ -44,7 +48,7 @@ describe('TeamService', () => {
       delete: jest.fn(),
       deleteByTeamAndUser: jest.fn(),
       countByTeamId: jest.fn(),
-      countApprovedByTeamId: jest.fn()
+      countApprovedByTeamId: jest.fn(),
     };
     mockLeagueRepo = {
       create: jest.fn(),
@@ -53,7 +57,7 @@ describe('TeamService', () => {
       update: jest.fn(),
       delete: jest.fn(),
       findAll: jest.fn(),
-      findActive: jest.fn()
+      findActive: jest.fn(),
     };
     mockUserRepo = {
       create: jest.fn(),
@@ -61,16 +65,21 @@ describe('TeamService', () => {
       findByEmail: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      findAll: jest.fn()
+      findAll: jest.fn(),
     };
-    teamService = new TeamService(mockTeamRepo, mockMemberRepo, mockUserRepo, mockLeagueRepo);
+    teamService = new TeamService(
+      mockTeamRepo,
+      mockMemberRepo,
+      mockUserRepo,
+      mockLeagueRepo
+    );
   });
 
   describe('createTeam', () => {
     const teamData = {
       name: 'Test Team',
       color: '#FF0000',
-      leagueId: 'league-1'
+      leagueId: 'league-1',
     };
     const captainId = 'user-1';
 
@@ -82,7 +91,7 @@ describe('TeamService', () => {
         slug: 'test-league',
         isActive: true,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       const createdTeam = {
@@ -91,7 +100,7 @@ describe('TeamService', () => {
         color: teamData.color,
         leagueId: teamData.leagueId,
         captainId,
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       mockLeagueRepo.findById.mockResolvedValue(league);
@@ -103,7 +112,7 @@ describe('TeamService', () => {
         userId: captainId,
         role: MemberRole.CAPTAIN,
         status: MemberStatus.APPROVED,
-        createdAt: new Date()
+        createdAt: new Date(),
       });
 
       // Act
@@ -111,16 +120,19 @@ describe('TeamService', () => {
 
       // Assert
       expect(mockLeagueRepo.findById).toHaveBeenCalledWith(teamData.leagueId);
-      expect(mockTeamRepo.findByNameAndLeague).toHaveBeenCalledWith(teamData.name, teamData.leagueId);
+      expect(mockTeamRepo.findByNameAndLeague).toHaveBeenCalledWith(
+        teamData.name,
+        teamData.leagueId
+      );
       expect(mockTeamRepo.create).toHaveBeenCalledWith({
         ...teamData,
-        captainId
+        captainId,
       });
       expect(mockMemberRepo.create).toHaveBeenCalledWith({
         teamId: 'team-1',
         userId: captainId,
         role: MemberRole.CAPTAIN,
-        status: MemberStatus.APPROVED
+        status: MemberStatus.APPROVED,
       });
       expect(result).toEqual(createdTeam);
     });
@@ -130,8 +142,9 @@ describe('TeamService', () => {
       mockLeagueRepo.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(teamService.createTeam(teamData, captainId))
-        .rejects.toThrow(TeamNotFoundError);
+      await expect(teamService.createTeam(teamData, captainId)).rejects.toThrow(
+        TeamNotFoundError
+      );
     });
 
     it('should throw error if team name already exists in league', async () => {
@@ -142,7 +155,7 @@ describe('TeamService', () => {
         slug: 'test-league',
         isActive: true,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       const existingTeam = {
@@ -150,15 +163,16 @@ describe('TeamService', () => {
         name: teamData.name,
         leagueId: teamData.leagueId,
         captainId: 'other-user',
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       mockLeagueRepo.findById.mockResolvedValue(league);
       mockTeamRepo.findByNameAndLeague.mockResolvedValue(existingTeam);
 
       // Act & Assert
-      await expect(teamService.createTeam(teamData, captainId))
-        .rejects.toThrow(DuplicateTeamNameError);
+      await expect(teamService.createTeam(teamData, captainId)).rejects.toThrow(
+        DuplicateTeamNameError
+      );
     });
   });
 
@@ -173,7 +187,7 @@ describe('TeamService', () => {
         name: 'Test Team',
         leagueId: 'league-1',
         captainId: 'captain-1',
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       const membership = {
@@ -182,7 +196,7 @@ describe('TeamService', () => {
         userId,
         role: MemberRole.MEMBER,
         status: MemberStatus.PENDING,
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       mockTeamRepo.findById.mockResolvedValue(team);
@@ -194,12 +208,15 @@ describe('TeamService', () => {
 
       // Assert
       expect(mockTeamRepo.findById).toHaveBeenCalledWith(teamId);
-      expect(mockMemberRepo.findByTeamAndUser).toHaveBeenCalledWith(teamId, userId);
+      expect(mockMemberRepo.findByTeamAndUser).toHaveBeenCalledWith(
+        teamId,
+        userId
+      );
       expect(mockMemberRepo.create).toHaveBeenCalledWith({
         teamId,
         userId,
         role: MemberRole.MEMBER,
-        status: MemberStatus.PENDING
+        status: MemberStatus.PENDING,
       });
       expect(result).toEqual(membership);
     });
@@ -209,8 +226,9 @@ describe('TeamService', () => {
       mockTeamRepo.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(teamService.joinTeam(teamId, userId))
-        .rejects.toThrow(TeamNotFoundError);
+      await expect(teamService.joinTeam(teamId, userId)).rejects.toThrow(
+        TeamNotFoundError
+      );
     });
 
     it('should throw error if user already member', async () => {
@@ -220,7 +238,7 @@ describe('TeamService', () => {
         name: 'Test Team',
         leagueId: 'league-1',
         captainId: 'captain-1',
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       const existingMembership = {
@@ -229,15 +247,16 @@ describe('TeamService', () => {
         userId,
         role: MemberRole.MEMBER,
         status: MemberStatus.APPROVED,
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       mockTeamRepo.findById.mockResolvedValue(team);
       mockMemberRepo.findByTeamAndUser.mockResolvedValue(existingMembership);
 
       // Act & Assert
-      await expect(teamService.joinTeam(teamId, userId))
-        .rejects.toThrow(TeamMembershipError);
+      await expect(teamService.joinTeam(teamId, userId)).rejects.toThrow(
+        TeamMembershipError
+      );
     });
   });
 
@@ -253,7 +272,7 @@ describe('TeamService', () => {
         name: 'Test Team',
         leagueId: 'league-1',
         captainId: approverId,
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       const membership = {
@@ -262,7 +281,7 @@ describe('TeamService', () => {
         userId,
         role: MemberRole.MEMBER,
         status: MemberStatus.PENDING,
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       const approver = {
@@ -272,12 +291,12 @@ describe('TeamService', () => {
         name: 'Captain',
         role: UserRole.USER,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       const updatedMembership = {
         ...membership,
-        status: MemberStatus.APPROVED
+        status: MemberStatus.APPROVED,
       };
 
       mockTeamRepo.findById.mockResolvedValue(team);
@@ -285,11 +304,16 @@ describe('TeamService', () => {
       mockMemberRepo.update.mockResolvedValue(updatedMembership);
 
       // Act
-      const result = await teamService.approveMember(teamId, userId, approverId, approver);
+      const result = await teamService.approveMember(
+        teamId,
+        userId,
+        approverId,
+        approver
+      );
 
       // Assert
       expect(mockMemberRepo.update).toHaveBeenCalledWith(membership.id, {
-        status: MemberStatus.APPROVED
+        status: MemberStatus.APPROVED,
       });
       expect(result).toEqual(updatedMembership);
     });
@@ -301,7 +325,7 @@ describe('TeamService', () => {
         name: 'Test Team',
         leagueId: 'league-1',
         captainId: 'other-captain',
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       const membership = {
@@ -310,7 +334,7 @@ describe('TeamService', () => {
         userId,
         role: MemberRole.MEMBER,
         status: MemberStatus.PENDING,
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       const organizer = {
@@ -320,12 +344,12 @@ describe('TeamService', () => {
         name: 'Organizer',
         role: UserRole.ORGANIZER,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       const updatedMembership = {
         ...membership,
-        status: MemberStatus.APPROVED
+        status: MemberStatus.APPROVED,
       };
 
       mockTeamRepo.findById.mockResolvedValue(team);
@@ -333,7 +357,12 @@ describe('TeamService', () => {
       mockMemberRepo.update.mockResolvedValue(updatedMembership);
 
       // Act
-      const result = await teamService.approveMember(teamId, userId, approverId, organizer);
+      const result = await teamService.approveMember(
+        teamId,
+        userId,
+        approverId,
+        organizer
+      );
 
       // Assert
       expect(result).toEqual(updatedMembership);
@@ -346,7 +375,7 @@ describe('TeamService', () => {
         name: 'Test Team',
         leagueId: 'league-1',
         captainId: 'other-captain',
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       const regularUser = {
@@ -356,14 +385,15 @@ describe('TeamService', () => {
         name: 'Regular User',
         role: UserRole.USER,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockTeamRepo.findById.mockResolvedValue(team);
 
       // Act & Assert
-      await expect(teamService.approveMember(teamId, userId, approverId, regularUser))
-        .rejects.toThrow(InsufficientPermissionsError);
+      await expect(
+        teamService.approveMember(teamId, userId, approverId, regularUser)
+      ).rejects.toThrow(InsufficientPermissionsError);
     });
 
     it('should throw error if membership not found', async () => {
@@ -373,7 +403,7 @@ describe('TeamService', () => {
         name: 'Test Team',
         leagueId: 'league-1',
         captainId: approverId,
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       const captain = {
@@ -383,15 +413,16 @@ describe('TeamService', () => {
         name: 'Captain',
         role: UserRole.USER,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockTeamRepo.findById.mockResolvedValue(team);
       mockMemberRepo.findByTeamAndUser.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(teamService.approveMember(teamId, userId, approverId, captain))
-        .rejects.toThrow(TeamMembershipError);
+      await expect(
+        teamService.approveMember(teamId, userId, approverId, captain)
+      ).rejects.toThrow(TeamMembershipError);
     });
   });
 });

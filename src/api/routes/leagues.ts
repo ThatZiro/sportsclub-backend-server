@@ -12,10 +12,10 @@ import { authMiddleware } from '../middleware/auth';
 import { requireRole } from '../middleware/authorization';
 import { validate } from '../middleware/validation';
 import { UserRole } from '../../domain/enums';
-import { 
-  createLeagueSchema, 
-  updateLeagueSchema, 
-  leagueIdParamSchema 
+import {
+  createLeagueSchema,
+  updateLeagueSchema,
+  leagueIdParamSchema,
 } from '../validators/league';
 
 // Create router
@@ -152,7 +152,11 @@ router.get('/', leagueController.getAllLeagues);
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/:id', validate(leagueIdParamSchema), leagueController.getLeagueById);
+router.get(
+  '/:id',
+  validate(leagueIdParamSchema),
+  leagueController.getLeagueById
+);
 
 /**
  * @swagger
@@ -212,7 +216,11 @@ router.get('/:id', validate(leagueIdParamSchema), leagueController.getLeagueById
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.patch('/:id', validate(updateLeagueSchema), leagueController.updateLeague);
+router.patch(
+  '/:id',
+  validate(updateLeagueSchema),
+  leagueController.updateLeague
+);
 
 /**
  * @swagger
@@ -250,6 +258,10 @@ router.patch('/:id', validate(updateLeagueSchema), leagueController.updateLeague
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.delete('/:id', validate(leagueIdParamSchema), leagueController.deleteLeague);
+router.delete(
+  '/:id',
+  validate(leagueIdParamSchema),
+  leagueController.deleteLeague
+);
 
 export default router;

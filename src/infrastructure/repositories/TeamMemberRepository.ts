@@ -10,7 +10,7 @@ import {
   CreateTeamMemberData,
   UpdateTeamMemberData,
   TeamMemberWithUser,
-  TeamMemberDomain
+  TeamMemberDomain,
 } from '../../domain/entities';
 import { MemberRole, MemberStatus } from '../../domain/enums';
 
@@ -32,8 +32,8 @@ export class TeamMemberRepository implements ITeamMemberRepository {
         teamId: preparedData.teamId,
         userId: preparedData.userId,
         role: preparedData.role!,
-        status: preparedData.status!
-      }
+        status: preparedData.status!,
+      },
     });
 
     return this.mapPrismaTeamMemberToEntity(teamMember);
@@ -44,7 +44,7 @@ export class TeamMemberRepository implements ITeamMemberRepository {
    */
   async findById(id: string): Promise<TeamMember | null> {
     const teamMember = await prisma.teamMember.findUnique({
-      where: { id }
+      where: { id },
     });
 
     return teamMember ? this.mapPrismaTeamMemberToEntity(teamMember) : null;
@@ -58,8 +58,8 @@ export class TeamMemberRepository implements ITeamMemberRepository {
       where: { teamId },
       orderBy: [
         { role: 'asc' }, // Captains first
-        { createdAt: 'asc' }
-      ]
+        { createdAt: 'asc' },
+      ],
     });
 
     return teamMembers.map(member => this.mapPrismaTeamMemberToEntity(member));
@@ -75,14 +75,14 @@ export class TeamMemberRepository implements ITeamMemberRepository {
         user: {
           select: {
             name: true,
-            email: true
-          }
-        }
+            email: true,
+          },
+        },
       },
       orderBy: [
         { role: 'asc' }, // Captains first
-        { createdAt: 'asc' }
-      ]
+        { createdAt: 'asc' },
+      ],
     });
 
     return teamMembers.map(member => ({
@@ -93,7 +93,7 @@ export class TeamMemberRepository implements ITeamMemberRepository {
       status: member.status as MemberStatus,
       createdAt: member.createdAt,
       userName: member.user.name,
-      userEmail: member.user.email
+      userEmail: member.user.email,
     }));
   }
 
@@ -103,7 +103,7 @@ export class TeamMemberRepository implements ITeamMemberRepository {
   async findByUserId(userId: string): Promise<TeamMember[]> {
     const teamMembers = await prisma.teamMember.findMany({
       where: { userId },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
     return teamMembers.map(member => this.mapPrismaTeamMemberToEntity(member));
@@ -112,14 +112,17 @@ export class TeamMemberRepository implements ITeamMemberRepository {
   /**
    * Finds a specific team membership by team and user
    */
-  async findByTeamAndUser(teamId: string, userId: string): Promise<TeamMember | null> {
+  async findByTeamAndUser(
+    teamId: string,
+    userId: string
+  ): Promise<TeamMember | null> {
     const teamMember = await prisma.teamMember.findUnique({
       where: {
         unique_team_membership: {
           teamId,
-          userId
-        }
-      }
+          userId,
+        },
+      },
     });
 
     return teamMember ? this.mapPrismaTeamMemberToEntity(teamMember) : null;
@@ -139,8 +142,8 @@ export class TeamMemberRepository implements ITeamMemberRepository {
       where: { id },
       data: {
         ...(data.role && { role: data.role }),
-        ...(data.status && { status: data.status })
-      }
+        ...(data.status && { status: data.status }),
+      },
     });
 
     return this.mapPrismaTeamMemberToEntity(teamMember);
@@ -151,7 +154,7 @@ export class TeamMemberRepository implements ITeamMemberRepository {
    */
   async delete(id: string): Promise<void> {
     await prisma.teamMember.delete({
-      where: { id }
+      where: { id },
     });
   }
 
@@ -163,9 +166,9 @@ export class TeamMemberRepository implements ITeamMemberRepository {
       where: {
         unique_team_membership: {
           teamId,
-          userId
-        }
-      }
+          userId,
+        },
+      },
     });
   }
 
@@ -174,7 +177,7 @@ export class TeamMemberRepository implements ITeamMemberRepository {
    */
   async countByTeamId(teamId: string): Promise<number> {
     return await prisma.teamMember.count({
-      where: { teamId }
+      where: { teamId },
     });
   }
 
@@ -185,8 +188,8 @@ export class TeamMemberRepository implements ITeamMemberRepository {
     return await prisma.teamMember.count({
       where: {
         teamId,
-        status: MemberStatus.APPROVED
-      }
+        status: MemberStatus.APPROVED,
+      },
     });
   }
 
@@ -200,7 +203,7 @@ export class TeamMemberRepository implements ITeamMemberRepository {
       userId: prismaTeamMember.userId,
       role: prismaTeamMember.role as MemberRole,
       status: prismaTeamMember.status as MemberStatus,
-      createdAt: prismaTeamMember.createdAt
+      createdAt: prismaTeamMember.createdAt,
     };
   }
 }

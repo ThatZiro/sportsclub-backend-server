@@ -10,9 +10,15 @@ import { MemberRole, MemberStatus } from '../../domain/enums';
  * Create team DTO
  */
 export const CreateTeamDTOSchema = z.object({
-  name: z.string().min(1, 'Team name is required').max(100, 'Team name must be less than 100 characters'),
-  color: z.string().max(50, 'Team color must be less than 50 characters').optional(),
-  leagueId: z.string().min(1, 'League ID is required')
+  name: z
+    .string()
+    .min(1, 'Team name is required')
+    .max(100, 'Team name must be less than 100 characters'),
+  color: z
+    .string()
+    .max(50, 'Team color must be less than 50 characters')
+    .optional(),
+  leagueId: z.string().min(1, 'League ID is required'),
 });
 
 export type CreateTeamDTO = z.infer<typeof CreateTeamDTOSchema>;
@@ -20,12 +26,21 @@ export type CreateTeamDTO = z.infer<typeof CreateTeamDTOSchema>;
 /**
  * Update team DTO
  */
-export const UpdateTeamDTOSchema = z.object({
-  name: z.string().min(1, 'Team name is required').max(100, 'Team name must be less than 100 characters').optional(),
-  color: z.string().max(50, 'Team color must be less than 50 characters').optional()
-}).refine(data => Object.keys(data).length > 0, {
-  message: 'At least one field must be provided for update'
-});
+export const UpdateTeamDTOSchema = z
+  .object({
+    name: z
+      .string()
+      .min(1, 'Team name is required')
+      .max(100, 'Team name must be less than 100 characters')
+      .optional(),
+    color: z
+      .string()
+      .max(50, 'Team color must be less than 50 characters')
+      .optional(),
+  })
+  .refine(data => Object.keys(data).length > 0, {
+    message: 'At least one field must be provided for update',
+  });
 
 export type UpdateTeamDTO = z.infer<typeof UpdateTeamDTOSchema>;
 
@@ -86,7 +101,7 @@ export type JoinTeamDTO = z.infer<typeof JoinTeamDTOSchema>;
  * Approve member DTO
  */
 export const ApproveMemberDTOSchema = z.object({
-  approve: z.boolean().default(true)
+  approve: z.boolean().default(true),
 });
 
 export type ApproveMemberDTO = z.infer<typeof ApproveMemberDTOSchema>;

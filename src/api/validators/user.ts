@@ -5,25 +5,24 @@ import { UserRole } from '../../domain/enums';
  * Validation schema for updating user profile
  */
 export const updateUserProfileSchema = z.object({
-  body: z.object({
-    name: z
-      .string()
-      .min(2, 'Name must be at least 2 characters')
-      .max(100, 'Name must not exceed 100 characters')
-      .trim()
-      .optional(),
-    email: z
-      .string()
-      .email('Invalid email format')
-      .toLowerCase()
-      .trim()
-      .optional()
-  }).refine(
-    (data) => Object.keys(data).length > 0,
-    {
-      message: 'At least one field must be provided for update'
-    }
-  )
+  body: z
+    .object({
+      name: z
+        .string()
+        .min(2, 'Name must be at least 2 characters')
+        .max(100, 'Name must not exceed 100 characters')
+        .trim()
+        .optional(),
+      email: z
+        .string()
+        .email('Invalid email format')
+        .toLowerCase()
+        .trim()
+        .optional(),
+    })
+    .refine(data => Object.keys(data).length > 0, {
+      message: 'At least one field must be provided for update',
+    }),
 });
 
 /**
@@ -32,12 +31,12 @@ export const updateUserProfileSchema = z.object({
 export const updateUserRoleSchema = z.object({
   body: z.object({
     role: z.nativeEnum(UserRole, {
-      errorMap: () => ({ message: 'Invalid user role' })
-    })
+      errorMap: () => ({ message: 'Invalid user role' }),
+    }),
   }),
   params: z.object({
-    userId: z.string().cuid('Invalid user ID format')
-  })
+    userId: z.string().cuid('Invalid user ID format'),
+  }),
 });
 
 /**
@@ -45,8 +44,8 @@ export const updateUserRoleSchema = z.object({
  */
 export const userIdParamSchema = z.object({
   params: z.object({
-    userId: z.string().cuid('Invalid user ID format')
-  })
+    userId: z.string().cuid('Invalid user ID format'),
+  }),
 });
 
 /**

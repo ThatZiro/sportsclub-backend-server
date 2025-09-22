@@ -94,6 +94,10 @@ router.get('/me', userController.getProfile);
  *               success: false
  *               message: Email already exists
  */
-router.patch('/me', validate(updateUserProfileSchema), userController.updateProfile);
+router.patch(
+  '/me',
+  validate(updateUserProfileSchema),
+  userController.updateProfile
+);
 
 export default router;

@@ -1,13 +1,13 @@
 import request from 'supertest';
 import app from '../app';
 import { prisma } from '../infrastructure/database/connection';
-import { 
-  AppError, 
-  ValidationError, 
-  AuthenticationError, 
-  AuthorizationError, 
-  NotFoundError, 
-  ConflictError 
+import {
+  AppError,
+  ValidationError,
+  AuthenticationError,
+  AuthorizationError,
+  NotFoundError,
+  ConflictError,
 } from '../api/middleware/errorHandler';
 import { appLogger } from '../config/logger';
 
@@ -44,7 +44,7 @@ describe('Error Handling and Logging', () => {
   describe('Custom Error Classes', () => {
     it('should create AppError with correct properties', () => {
       const error = new AppError('Test error', 400);
-      
+
       expect(error.message).toBe('Test error');
       expect(error.statusCode).toBe(400);
       expect(error.isOperational).toBe(true);
@@ -53,7 +53,7 @@ describe('Error Handling and Logging', () => {
 
     it('should create ValidationError with 400 status', () => {
       const error = new ValidationError('Invalid input');
-      
+
       expect(error.message).toBe('Invalid input');
       expect(error.statusCode).toBe(400);
       expect(error.isOperational).toBe(true);
@@ -61,7 +61,7 @@ describe('Error Handling and Logging', () => {
 
     it('should create AuthenticationError with 401 status', () => {
       const error = new AuthenticationError();
-      
+
       expect(error.message).toBe('Authentication failed');
       expect(error.statusCode).toBe(401);
       expect(error.isOperational).toBe(true);
@@ -69,7 +69,7 @@ describe('Error Handling and Logging', () => {
 
     it('should create AuthorizationError with 403 status', () => {
       const error = new AuthorizationError();
-      
+
       expect(error.message).toBe('Insufficient permissions');
       expect(error.statusCode).toBe(403);
       expect(error.isOperational).toBe(true);
@@ -77,7 +77,7 @@ describe('Error Handling and Logging', () => {
 
     it('should create NotFoundError with 404 status', () => {
       const error = new NotFoundError('User');
-      
+
       expect(error.message).toBe('User not found');
       expect(error.statusCode).toBe(404);
       expect(error.isOperational).toBe(true);
@@ -85,7 +85,7 @@ describe('Error Handling and Logging', () => {
 
     it('should create ConflictError with 409 status', () => {
       const error = new ConflictError('Resource already exists');
-      
+
       expect(error.message).toBe('Resource already exists');
       expect(error.statusCode).toBe(409);
       expect(error.isOperational).toBe(true);
@@ -110,7 +110,7 @@ describe('Error Handling and Logging', () => {
         .post('/api/auth/signup')
         .send({
           // Missing required fields to trigger validation error
-          email: 'invalid-email'
+          email: 'invalid-email',
         })
         .expect(400);
 
@@ -121,7 +121,7 @@ describe('Error Handling and Logging', () => {
 
     it('should include request ID in error responses', async () => {
       const requestId = 'test-request-id-123';
-      
+
       const response = await request(app)
         .get('/api/non-existent-route')
         .set('X-Request-ID', requestId)
@@ -169,27 +169,21 @@ describe('Error Handling and Logging', () => {
 
   describe('Request Logging', () => {
     it('should log incoming requests', async () => {
-      await request(app)
-        .get('/docs')
-        .expect(200);
+      await request(app).get('/docs').expect(200);
 
       // Verify that request logging was called
       expect(appLogger.logRequest).toHaveBeenCalled();
     });
 
     it('should log responses with status codes', async () => {
-      await request(app)
-        .get('/docs')
-        .expect(200);
+      await request(app).get('/docs').expect(200);
 
       // Verify that response logging was called
       expect(appLogger.logResponse).toHaveBeenCalled();
     });
 
     it('should generate request ID if not provided', async () => {
-      const response = await request(app)
-        .get('/docs')
-        .expect(200);
+      const response = await request(app).get('/docs').expect(200);
 
       // Should have a request ID in the response headers
       expect(response.headers['x-request-id']).toBeDefined();
@@ -198,7 +192,7 @@ describe('Error Handling and Logging', () => {
 
     it('should preserve provided request ID', async () => {
       const requestId = 'custom-request-id-456';
-      
+
       const response = await request(app)
         .get('/docs')
         .set('X-Request-ID', requestId)
@@ -210,9 +204,7 @@ describe('Error Handling and Logging', () => {
 
   describe('Error Logging', () => {
     it('should log errors with context when they occur', async () => {
-      await request(app)
-        .get('/api/non-existent-route')
-        .expect(404);
+      await request(app).get('/api/non-existent-route').expect(404);
 
       // Verify that error logging was called
       expect(appLogger.logError).toHaveBeenCalled();
@@ -224,13 +216,13 @@ describe('Error Handling and Logging', () => {
         .send({
           email: 'test@example.com',
           password: 'secretpassword123',
-          name: 'Test User'
+          name: 'Test User',
         })
         .expect(400); // Will fail due to validation or other issues
 
       // Check if logging was called (error or request logging)
       const logCalls = (appLogger.logRequest as jest.Mock).mock.calls;
-      
+
       if (logCalls.length > 0) {
         // Verify that password is not logged in plain text
         const loggedData = JSON.stringify(logCalls);
@@ -246,7 +238,7 @@ describe('Error Handling and Logging', () => {
         .post('/api/auth/login')
         .send({
           email: 'nonexistent@example.com',
-          password: 'wrongpassword'
+          password: 'wrongpassword',
         })
         .expect(401);
 
@@ -261,13 +253,10 @@ describe('Error Handling and Logging', () => {
       const userData = {
         email: 'unique-test@example.com',
         password: 'password123',
-        name: 'Unique Test User'
+        name: 'Unique Test User',
       };
 
-      await request(app)
-        .post('/api/auth/signup')
-        .send(userData)
-        .expect(201);
+      await request(app).post('/api/auth/signup').send(userData).expect(201);
 
       // Try to create the same user again (should trigger unique constraint error)
       const response = await request(app)

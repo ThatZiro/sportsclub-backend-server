@@ -5,12 +5,12 @@
 export enum UserRole {
   /** Regular user who can join teams and participate in leagues */
   USER = 'USER',
-  
+
   /** Organizer who can manage leagues and teams */
   ORGANIZER = 'ORGANIZER',
-  
+
   /** Administrator with full system access */
-  ADMIN = 'ADMIN'
+  ADMIN = 'ADMIN',
 }
 
 /**

@@ -10,7 +10,7 @@ import {
   CreateTeamData,
   UpdateTeamData,
   TeamSummary,
-  TeamDomain
+  TeamDomain,
 } from '../../domain/entities';
 import { MemberStatus } from '../../domain/enums';
 
@@ -32,8 +32,8 @@ export class TeamRepository implements ITeamRepository {
         name: preparedData.name,
         color: preparedData.color || null,
         leagueId: preparedData.leagueId,
-        captainId: preparedData.captainId
-      }
+        captainId: preparedData.captainId,
+      },
     });
 
     return this.mapPrismaTeamToEntity(team);
@@ -44,7 +44,7 @@ export class TeamRepository implements ITeamRepository {
    */
   async findById(id: string): Promise<Team | null> {
     const team = await prisma.team.findUnique({
-      where: { id }
+      where: { id },
     });
 
     return team ? this.mapPrismaTeamToEntity(team) : null;
@@ -56,7 +56,7 @@ export class TeamRepository implements ITeamRepository {
   async findByLeagueId(leagueId: string): Promise<Team[]> {
     const teams = await prisma.team.findMany({
       where: { leagueId },
-      orderBy: { createdAt: 'asc' }
+      orderBy: { createdAt: 'asc' },
     });
 
     return teams.map(team => this.mapPrismaTeamToEntity(team));
@@ -71,16 +71,16 @@ export class TeamRepository implements ITeamRepository {
       include: {
         captain: {
           select: {
-            name: true
-          }
+            name: true,
+          },
         },
         members: {
           where: {
-            status: MemberStatus.APPROVED
-          }
-        }
+            status: MemberStatus.APPROVED,
+          },
+        },
       },
-      orderBy: { createdAt: 'asc' }
+      orderBy: { createdAt: 'asc' },
     });
 
     return teams.map(team => {
@@ -91,13 +91,13 @@ export class TeamRepository implements ITeamRepository {
         captainId: team.captainId,
         captainName: team.captain.name,
         memberCount: team.members.length,
-        createdAt: team.createdAt
+        createdAt: team.createdAt,
       };
-      
+
       if (team.color) {
         summary.color = team.color;
       }
-      
+
       return summary;
     });
   }
@@ -108,7 +108,7 @@ export class TeamRepository implements ITeamRepository {
   async findByCaptainId(captainId: string): Promise<Team[]> {
     const teams = await prisma.team.findMany({
       where: { captainId },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
     return teams.map(team => this.mapPrismaTeamToEntity(team));
@@ -131,8 +131,8 @@ export class TeamRepository implements ITeamRepository {
       data: {
         ...(preparedData.name && { name: preparedData.name }),
         ...(preparedData.color !== undefined && { color: preparedData.color }),
-        ...(preparedData.captainId && { captainId: preparedData.captainId })
-      }
+        ...(preparedData.captainId && { captainId: preparedData.captainId }),
+      },
     });
 
     return this.mapPrismaTeamToEntity(team);
@@ -143,19 +143,22 @@ export class TeamRepository implements ITeamRepository {
    */
   async delete(id: string): Promise<void> {
     await prisma.team.delete({
-      where: { id }
+      where: { id },
     });
   }
 
   /**
    * Finds a team by name and league (for uniqueness checking)
    */
-  async findByNameAndLeague(name: string, leagueId: string): Promise<Team | null> {
+  async findByNameAndLeague(
+    name: string,
+    leagueId: string
+  ): Promise<Team | null> {
     const team = await prisma.team.findFirst({
       where: {
         name: name.trim(),
-        leagueId
-      }
+        leagueId,
+      },
     });
 
     return team ? this.mapPrismaTeamToEntity(team) : null;
@@ -171,7 +174,7 @@ export class TeamRepository implements ITeamRepository {
       color: prismaTeam.color,
       leagueId: prismaTeam.leagueId,
       captainId: prismaTeam.captainId,
-      createdAt: prismaTeam.createdAt
+      createdAt: prismaTeam.createdAt,
     };
   }
 }

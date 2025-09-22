@@ -34,7 +34,6 @@ async function dockerInit() {
     console.log('✅ Database seeded successfully\n');
 
     console.log('🎉 Docker initialization completed successfully!');
-
   } catch (error) {
     console.error('❌ Docker initialization failed:', error);
     process.exit(1);
@@ -47,7 +46,9 @@ async function waitForDatabase(maxRetries = 30, delay = 2000): Promise<void> {
       await execAsync('npx prisma db execute --stdin <<< "SELECT 1;"');
       return;
     } catch (error) {
-      console.log(`  Attempt ${i + 1}/${maxRetries}: Database not ready yet, waiting...`);
+      console.log(
+        `  Attempt ${i + 1}/${maxRetries}: Database not ready yet, waiting...`
+      );
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }

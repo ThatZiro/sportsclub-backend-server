@@ -10,17 +10,13 @@ export const signupSchema = z.object({
       .min(2, 'Name must be at least 2 characters')
       .max(100, 'Name must not exceed 100 characters')
       .trim(),
-    email: z
-      .string()
-      .email('Invalid email format')
-      .toLowerCase()
-      .trim(),
+    email: z.string().email('Invalid email format').toLowerCase().trim(),
     password: z
       .string()
       .min(8, 'Password must be at least 8 characters')
       .regex(/[A-Za-z]/, 'Password must contain at least one letter')
-      .regex(/\d/, 'Password must contain at least one number')
-  })
+      .regex(/\d/, 'Password must contain at least one number'),
+  }),
 });
 
 /**
@@ -28,15 +24,9 @@ export const signupSchema = z.object({
  */
 export const loginSchema = z.object({
   body: z.object({
-    email: z
-      .string()
-      .email('Invalid email format')
-      .toLowerCase()
-      .trim(),
-    password: z
-      .string()
-      .min(1, 'Password is required')
-  })
+    email: z.string().email('Invalid email format').toLowerCase().trim(),
+    password: z.string().min(1, 'Password is required'),
+  }),
 });
 
 /**

@@ -9,7 +9,7 @@ import {
   League,
   CreateLeagueData,
   UpdateLeagueData,
-  LeagueDomain
+  LeagueDomain,
 } from '../../domain/entities';
 
 export class LeagueRepository implements ILeagueRepository {
@@ -28,8 +28,8 @@ export class LeagueRepository implements ILeagueRepository {
         name: data.name,
         slug: data.slug,
         season: data.season || null,
-        isActive: data.isActive ?? true
-      }
+        isActive: data.isActive ?? true,
+      },
     });
 
     return this.mapPrismaLeagueToEntity(league);
@@ -40,7 +40,7 @@ export class LeagueRepository implements ILeagueRepository {
    */
   async findById(id: string): Promise<League | null> {
     const league = await prisma.league.findUnique({
-      where: { id }
+      where: { id },
     });
 
     return league ? this.mapPrismaLeagueToEntity(league) : null;
@@ -51,7 +51,7 @@ export class LeagueRepository implements ILeagueRepository {
    */
   async findBySlug(slug: string): Promise<League | null> {
     const league = await prisma.league.findUnique({
-      where: { slug }
+      where: { slug },
     });
 
     return league ? this.mapPrismaLeagueToEntity(league) : null;
@@ -73,8 +73,8 @@ export class LeagueRepository implements ILeagueRepository {
         ...(data.name && { name: data.name }),
         ...(data.slug && { slug: data.slug }),
         ...(data.season !== undefined && { season: data.season }),
-        ...(data.isActive !== undefined && { isActive: data.isActive })
-      }
+        ...(data.isActive !== undefined && { isActive: data.isActive }),
+      },
     });
 
     return this.mapPrismaLeagueToEntity(league);
@@ -85,7 +85,7 @@ export class LeagueRepository implements ILeagueRepository {
    */
   async delete(id: string): Promise<void> {
     await prisma.league.delete({
-      where: { id }
+      where: { id },
     });
   }
 
@@ -94,7 +94,7 @@ export class LeagueRepository implements ILeagueRepository {
    */
   async findAll(): Promise<League[]> {
     const leagues = await prisma.league.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
     return leagues.map(league => this.mapPrismaLeagueToEntity(league));
@@ -106,7 +106,7 @@ export class LeagueRepository implements ILeagueRepository {
   async findActive(): Promise<League[]> {
     const leagues = await prisma.league.findMany({
       where: { isActive: true },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
     return leagues.map(league => this.mapPrismaLeagueToEntity(league));
@@ -123,7 +123,7 @@ export class LeagueRepository implements ILeagueRepository {
       season: prismaLeague.season,
       isActive: prismaLeague.isActive,
       createdAt: prismaLeague.createdAt,
-      updatedAt: prismaLeague.updatedAt
+      updatedAt: prismaLeague.updatedAt,
     };
   }
 }

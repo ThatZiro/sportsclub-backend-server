@@ -5,7 +5,12 @@
 
 import request from 'supertest';
 import app from '../../app';
-import { setupTestDatabase, teardownTestDatabase, cleanDatabase, seedTestData } from '../database';
+import {
+  setupTestDatabase,
+  teardownTestDatabase,
+  cleanDatabase,
+  seedTestData,
+} from '../database';
 
 describe('Authorization Integration Tests', () => {
   let testData: any;
@@ -22,28 +27,22 @@ describe('Authorization Integration Tests', () => {
     testData = await seedTestData();
 
     // Login all test users
-    const organizerLogin = await request(app)
-      .post('/auth/login')
-      .send({
-        email: 'organizer@test.com',
-        password: 'password123'
-      });
+    const organizerLogin = await request(app).post('/auth/login').send({
+      email: 'organizer@test.com',
+      password: 'password123',
+    });
     organizerCookies = organizerLogin.headers['set-cookie'];
 
-    const captainLogin = await request(app)
-      .post('/auth/login')
-      .send({
-        email: 'captain@test.com',
-        password: 'password123'
-      });
+    const captainLogin = await request(app).post('/auth/login').send({
+      email: 'captain@test.com',
+      password: 'password123',
+    });
     captainCookies = captainLogin.headers['set-cookie'];
 
-    const playerLogin = await request(app)
-      .post('/auth/login')
-      .send({
-        email: 'player@test.com',
-        password: 'password123'
-      });
+    const playerLogin = await request(app).post('/auth/login').send({
+      email: 'player@test.com',
+      password: 'password123',
+    });
     playerCookies = playerLogin.headers['set-cookie'];
   });
 
@@ -55,7 +54,7 @@ describe('Authorization Integration Tests', () => {
     describe('POST /leagues', () => {
       const leagueData = {
         name: 'New League',
-        season: 'Fall 2024'
+        season: 'Fall 2024',
       };
 
       it('should allow organizer to create league', async () => {
@@ -90,16 +89,13 @@ describe('Authorization Integration Tests', () => {
       });
 
       it('should deny unauthenticated access', async () => {
-        await request(app)
-          .post('/leagues')
-          .send(leagueData)
-          .expect(401);
+        await request(app).post('/leagues').send(leagueData).expect(401);
       });
     });
 
     describe('PATCH /leagues/:id', () => {
       const updates = {
-        name: 'Updated League Name'
+        name: 'Updated League Name',
       };
 
       it('should allow organizer to update league', async () => {
@@ -158,7 +154,7 @@ describe('Authorization Integration Tests', () => {
   describe('Team Management Authorization', () => {
     describe('PATCH /teams/:id', () => {
       const updates = {
-        name: 'Updated Team Name'
+        name: 'Updated Team Name',
       };
 
       it('should allow captain to update their own team', async () => {
@@ -191,20 +187,16 @@ describe('Authorization Integration Tests', () => {
 
       it('should deny captain access to update other teams', async () => {
         // Create another team with different captain
-        await request(app)
-          .post('/auth/signup')
-          .send({
-            email: 'othercaptain@test.com',
-            password: 'password123',
-            name: 'Other Captain'
-          });
+        await request(app).post('/auth/signup').send({
+          email: 'othercaptain@test.com',
+          password: 'password123',
+          name: 'Other Captain',
+        });
 
-        const otherCaptainLogin = await request(app)
-          .post('/auth/login')
-          .send({
-            email: 'othercaptain@test.com',
-            password: 'password123'
-          });
+        const otherCaptainLogin = await request(app).post('/auth/login').send({
+          email: 'othercaptain@test.com',
+          password: 'password123',
+        });
 
         const otherCaptainCookies = otherCaptainLogin.headers['set-cookie'];
 
@@ -213,7 +205,7 @@ describe('Authorization Integration Tests', () => {
           .set('Cookie', otherCaptainCookies)
           .send({
             name: 'Other Team',
-            leagueId: testData.league.id
+            leagueId: testData.league.id,
           });
 
         const otherTeamId = otherTeamResponse.body.team.id;
@@ -255,7 +247,9 @@ describe('Authorization Integration Tests', () => {
     describe('POST /teams/:id/members/:userId/approve', () => {
       it('should allow captain to approve members of their team', async () => {
         const response = await request(app)
-          .post(`/teams/${testData.team.id}/members/${testData.player.id}/approve`)
+          .post(
+            `/teams/${testData.team.id}/members/${testData.player.id}/approve`
+          )
           .set('Cookie', captainCookies)
           .expect(200);
 
@@ -264,7 +258,9 @@ describe('Authorization Integration Tests', () => {
 
       it('should allow organizer to approve members of any team', async () => {
         const response = await request(app)
-          .post(`/teams/${testData.team.id}/members/${testData.player.id}/approve`)
+          .post(
+            `/teams/${testData.team.id}/members/${testData.player.id}/approve`
+          )
           .set('Cookie', organizerCookies)
           .expect(200);
 
@@ -273,7 +269,9 @@ describe('Authorization Integration Tests', () => {
 
       it('should deny regular member access to approve members', async () => {
         await request(app)
-          .post(`/teams/${testData.team.id}/members/${testData.player.id}/approve`)
+          .post(
+            `/teams/${testData.team.id}/members/${testData.player.id}/approve`
+          )
           .set('Cookie', playerCookies)
           .expect(403);
       });
@@ -292,15 +290,13 @@ describe('Authorization Integration Tests', () => {
       });
 
       it('should deny unauthenticated access', async () => {
-        await request(app)
-          .get('/me')
-          .expect(401);
+        await request(app).get('/me').expect(401);
       });
     });
 
     describe('PATCH /me', () => {
       const updates = {
-        name: 'Updated Name'
+        name: 'Updated Name',
       };
 
       it('should allow authenticated user to update their profile', async () => {
@@ -314,10 +310,7 @@ describe('Authorization Integration Tests', () => {
       });
 
       it('should deny unauthenticated access', async () => {
-        await request(app)
-          .patch('/me')
-          .send(updates)
-          .expect(401);
+        await request(app).patch('/me').send(updates).expect(401);
       });
     });
   });
@@ -368,7 +361,9 @@ describe('Authorization Integration Tests', () => {
       // For now, we'll test with a malformed token
       await request(app)
         .get('/me')
-        .set('Cookie', ['token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.expired.token'])
+        .set('Cookie', [
+          'token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.expired.token',
+        ])
         .expect(401);
     });
   });

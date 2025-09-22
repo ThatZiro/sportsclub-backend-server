@@ -5,9 +5,9 @@
 export enum MemberRole {
   /** Team captain with management privileges */
   CAPTAIN = 'CAPTAIN',
-  
+
   /** Regular team member */
-  MEMBER = 'MEMBER'
+  MEMBER = 'MEMBER',
 }
 
 /**

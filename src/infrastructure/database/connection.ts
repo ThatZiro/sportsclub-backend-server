@@ -8,9 +8,14 @@ declare global {
 // Create a singleton Prisma client instance
 // In development, we use a global variable to prevent multiple instances
 // due to hot reloading
-const prisma = globalThis.__prisma || new PrismaClient({
-  log: process.env['NODE_ENV'] === 'development' ? ['query', 'error', 'warn'] : ['error'],
-});
+const prisma =
+  globalThis.__prisma ||
+  new PrismaClient({
+    log:
+      process.env['NODE_ENV'] === 'development'
+        ? ['query', 'error', 'warn']
+        : ['error'],
+  });
 
 if (process.env['NODE_ENV'] === 'development') {
   globalThis.__prisma = prisma;
@@ -30,7 +35,9 @@ export async function checkDatabaseConnection(): Promise<boolean> {
     return true;
   } catch (error) {
     const { appLogger } = await import('../../config/logger');
-    appLogger.error('Database connection failed', undefined, { error: (error as Error).message });
+    appLogger.error('Database connection failed', undefined, {
+      error: (error as Error).message,
+    });
     return false;
   }
 }

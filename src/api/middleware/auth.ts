@@ -35,7 +35,7 @@ export const authMiddleware = async (
     if (!token) {
       res.status(401).json({
         error: 'Authentication required',
-        message: 'No authentication token provided'
+        message: 'No authentication token provided',
       });
       return;
     }
@@ -55,7 +55,7 @@ export const authMiddleware = async (
     if (!user) {
       res.status(401).json({
         error: 'Authentication failed',
-        message: 'User not found'
+        message: 'User not found',
       });
       return;
     }
@@ -67,7 +67,7 @@ export const authMiddleware = async (
     if (error instanceof jwt.JsonWebTokenError) {
       res.status(401).json({
         error: 'Authentication failed',
-        message: 'Invalid token'
+        message: 'Invalid token',
       });
       return;
     }
@@ -75,7 +75,7 @@ export const authMiddleware = async (
     if (error instanceof jwt.TokenExpiredError) {
       res.status(401).json({
         error: 'Authentication failed',
-        message: 'Token expired'
+        message: 'Token expired',
       });
       return;
     }
@@ -86,7 +86,7 @@ export const authMiddleware = async (
     });
     res.status(500).json({
       error: 'Internal server error',
-      message: 'Authentication service unavailable'
+      message: 'Authentication service unavailable',
     });
   }
 };

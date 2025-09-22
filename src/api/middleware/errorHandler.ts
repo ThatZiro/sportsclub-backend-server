@@ -9,7 +9,11 @@ export class AppError extends Error {
   public readonly statusCode: number;
   public readonly isOperational: boolean;
 
-  constructor(message: string, statusCode: number = 500, isOperational: boolean = true) {
+  constructor(
+    message: string,
+    statusCode: number = 500,
+    isOperational: boolean = true
+  ) {
     super(message);
     this.statusCode = statusCode;
     this.isOperational = isOperational;
@@ -97,8 +101,8 @@ export const errorHandler = (
         statusCode = 409;
         message = 'Resource already exists';
         if (error.meta?.['target']) {
-          const field = Array.isArray(error.meta['target']) 
-            ? error.meta['target'][0] 
+          const field = Array.isArray(error.meta['target'])
+            ? error.meta['target'][0]
             : error.meta['target'];
           message = `${field} already exists`;
         }
@@ -127,8 +131,7 @@ export const errorHandler = (
   else if (error instanceof Prisma.PrismaClientInitializationError) {
     statusCode = 503;
     message = 'Database connection failed';
-  }
-  else if (error instanceof Prisma.PrismaClientRustPanicError) {
+  } else if (error instanceof Prisma.PrismaClientRustPanicError) {
     statusCode = 500;
     message = 'Database error occurred';
   }

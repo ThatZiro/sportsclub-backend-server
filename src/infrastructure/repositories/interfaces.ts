@@ -17,7 +17,7 @@ import {
   TeamMember,
   CreateTeamMemberData,
   UpdateTeamMemberData,
-  TeamMemberWithUser
+  TeamMemberWithUser,
 } from '../../domain/entities';
 
 /**

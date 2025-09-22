@@ -3,9 +3,21 @@
  * Handles league management operations
  */
 
-import { ILeagueRepository, IUserRepository } from '../../infrastructure/repositories/interfaces';
-import { CreateLeagueDTO, UpdateLeagueDTO, LeagueDTO, PublicLeagueDTO } from '../dtos/league.dto';
-import { League, CreateLeagueData, UpdateLeagueData } from '../../domain/entities';
+import {
+  ILeagueRepository,
+  IUserRepository,
+} from '../../infrastructure/repositories/interfaces';
+import {
+  CreateLeagueDTO,
+  UpdateLeagueDTO,
+  LeagueDTO,
+  PublicLeagueDTO,
+} from '../dtos/league.dto';
+import {
+  League,
+  CreateLeagueData,
+  UpdateLeagueData,
+} from '../../domain/entities';
 import { UserRole } from '../../domain/enums';
 
 /**
@@ -62,12 +74,17 @@ export class LeagueService {
    * Create a new league (organizer/admin only)
    * Requirements: 7.1
    */
-  async createLeague(leagueData: CreateLeagueDTO, requestingUserId: string): Promise<LeagueDTO> {
+  async createLeague(
+    leagueData: CreateLeagueDTO,
+    requestingUserId: string
+  ): Promise<LeagueDTO> {
     // Verify user permissions
     await this.verifyOrganizerPermissions(requestingUserId);
 
     // Check if slug already exists
-    const existingLeague = await this.leagueRepository.findBySlug(leagueData.slug);
+    const existingLeague = await this.leagueRepository.findBySlug(
+      leagueData.slug
+    );
     if (existingLeague) {
       throw new DuplicateLeagueSlugError(leagueData.slug);
     }
@@ -76,8 +93,8 @@ export class LeagueService {
     const createData: CreateLeagueData = {
       name: leagueData.name,
       slug: leagueData.slug,
-      season: leagueData.season,
-      isActive: leagueData.isActive ?? true
+      ...(leagueData.season && { season: leagueData.season }),
+      isActive: leagueData.isActive ?? true,
     };
 
     const league = await this.leagueRepository.create(createData);
@@ -88,7 +105,11 @@ export class LeagueService {
    * Update league information (organizer/admin only)
    * Requirements: 7.2
    */
-  async updateLeague(leagueId: string, updates: UpdateLeagueDTO, requestingUserId: string): Promise<LeagueDTO> {
+  async updateLeague(
+    leagueId: string,
+    updates: UpdateLeagueDTO,
+    requestingUserId: string
+  ): Promise<LeagueDTO> {
     // Verify user permissions
     await this.verifyOrganizerPermissions(requestingUserId);
 
@@ -100,7 +121,9 @@ export class LeagueService {
 
     // If slug is being updated, check for duplicates
     if (updates.slug && updates.slug !== existingLeague.slug) {
-      const leagueWithSlug = await this.leagueRepository.findBySlug(updates.slug);
+      const leagueWithSlug = await this.leagueRepository.findBySlug(
+        updates.slug
+      );
       if (leagueWithSlug) {
         throw new DuplicateLeagueSlugError(updates.slug);
       }
@@ -121,7 +144,10 @@ export class LeagueService {
       updateData.isActive = updates.isActive;
     }
 
-    const updatedLeague = await this.leagueRepository.update(leagueId, updateData);
+    const updatedLeague = await this.leagueRepository.update(
+      leagueId,
+      updateData
+    );
     return this.mapToDTO(updatedLeague);
   }
 
@@ -129,7 +155,10 @@ export class LeagueService {
    * Delete league (organizer/admin only)
    * Requirements: 7.3
    */
-  async deleteLeague(leagueId: string, requestingUserId: string): Promise<void> {
+  async deleteLeague(
+    leagueId: string,
+    requestingUserId: string
+  ): Promise<void> {
     // Verify user permissions
     await this.verifyOrganizerPermissions(requestingUserId);
 
@@ -158,7 +187,10 @@ export class LeagueService {
    * Get league by ID (organizer/admin only)
    * Requirements: 7.1, 7.2, 7.3
    */
-  async getLeagueById(leagueId: string, requestingUserId: string): Promise<LeagueDTO> {
+  async getLeagueById(
+    leagueId: string,
+    requestingUserId: string
+  ): Promise<LeagueDTO> {
     // Verify user permissions
     await this.verifyOrganizerPermissions(requestingUserId);
 
@@ -203,10 +235,10 @@ export class LeagueService {
       id: league.id,
       name: league.name,
       slug: league.slug,
-      season: league.season,
+      ...(league.season && { season: league.season }),
       isActive: league.isActive,
       createdAt: league.createdAt,
-      updatedAt: league.updatedAt
+      updatedAt: league.updatedAt,
     };
   }
 
@@ -219,8 +251,8 @@ export class LeagueService {
       id: league.id,
       name: league.name,
       slug: league.slug,
-      season: league.season,
-      isActive: league.isActive
+      ...(league.season && { season: league.season }),
+      isActive: league.isActive,
     };
   }
 }

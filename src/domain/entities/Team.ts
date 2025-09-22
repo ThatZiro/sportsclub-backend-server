@@ -109,7 +109,11 @@ export class TeamDomain {
       errors.push('Team name must be between 2 and 50 characters');
     }
 
-    if (data.color !== undefined && data.color !== null && !this.isValidColor(data.color)) {
+    if (
+      data.color !== undefined &&
+      data.color !== null &&
+      !this.isValidColor(data.color)
+    ) {
       errors.push('Team color must be a valid hex color code (e.g., #FF0000)');
     }
 
@@ -141,16 +145,16 @@ export class TeamDomain {
   static prepareCreateData(data: CreateTeamData): CreateTeamData {
     const prepared: CreateTeamData = {
       ...data,
-      name: data.name.trim()
+      name: data.name.trim(),
     };
-    
+
     if (data.color !== undefined) {
       const normalizedColor = this.normalizeColor(data.color);
       if (normalizedColor !== undefined) {
         prepared.color = normalizedColor;
       }
     }
-    
+
     return prepared;
   }
 

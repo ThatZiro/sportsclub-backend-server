@@ -27,7 +27,7 @@ import {
   AuthenticationError,
   AuthorizationError,
   NotFoundError,
-  ConflictError
+  ConflictError,
 } from '../api/middleware';
 
 // Test all validator imports
@@ -46,7 +46,7 @@ import {
   teamIdParamSchema,
   joinTeamSchema,
   approveMemberSchema,
-  getTeamsByLeagueSchema
+  getTeamsByLeagueSchema,
 } from '../api/validators';
 
 console.log('✅ All middleware components imported successfully');
@@ -70,7 +70,7 @@ const middlewareComponents = {
   validateParams,
   validateQuery,
   errorHandler,
-  asyncHandler
+  asyncHandler,
 };
 
 const errorClasses = {
@@ -79,7 +79,7 @@ const errorClasses = {
   AuthenticationError,
   AuthorizationError,
   NotFoundError,
-  ConflictError
+  ConflictError,
 };
 
 const validationSchemas = {
@@ -97,11 +97,15 @@ const validationSchemas = {
   teamIdParamSchema,
   joinTeamSchema,
   approveMemberSchema,
-  getTeamsByLeagueSchema
+  getTeamsByLeagueSchema,
 };
 
-console.log(`✅ ${Object.keys(middlewareComponents).length} middleware components verified`);
+console.log(
+  `✅ ${Object.keys(middlewareComponents).length} middleware components verified`
+);
 console.log(`✅ ${Object.keys(errorClasses).length} error classes verified`);
-console.log(`✅ ${Object.keys(validationSchemas).length} validation schemas verified`);
+console.log(
+  `✅ ${Object.keys(validationSchemas).length} validation schemas verified`
+);
 
 export { middlewareComponents, errorClasses, validationSchemas };

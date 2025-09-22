@@ -16,18 +16,22 @@ export class AuthController {
    * Create new user account
    * Requirements: 1.1, 1.2, 1.3
    */
-  signup = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  signup = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const { body } = req as SignupRequest;
-      
+
       const result = await this.authService.signup(body);
-      
+
       // Set JWT token in HTTP-only cookie
       res.cookie('authToken', result.token, {
         httpOnly: true,
         secure: process.env['NODE_ENV'] === 'production',
         sameSite: 'strict',
-        maxAge: 60 * 60 * 1000 // 1 hour
+        maxAge: 60 * 60 * 1000, // 1 hour
       });
 
       // Return user data (without password hash)
@@ -41,9 +45,9 @@ export class AuthController {
             email: result.user.email,
             role: result.user.role,
             createdAt: result.user.createdAt,
-            updatedAt: result.user.updatedAt
-          }
-        }
+            updatedAt: result.user.updatedAt,
+          },
+        },
       });
     } catch (error) {
       next(error);
@@ -55,18 +59,22 @@ export class AuthController {
    * Authenticate user and return JWT token
    * Requirements: 2.1, 2.2
    */
-  login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  login = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const { body } = req as LoginRequest;
-      
+
       const result = await this.authService.login(body);
-      
+
       // Set JWT token in HTTP-only cookie
       res.cookie('authToken', result.token, {
         httpOnly: true,
         secure: process.env['NODE_ENV'] === 'production',
         sameSite: 'strict',
-        maxAge: 60 * 60 * 1000 // 1 hour
+        maxAge: 60 * 60 * 1000, // 1 hour
       });
 
       // Return user data (without password hash)
@@ -80,9 +88,9 @@ export class AuthController {
             email: result.user.email,
             role: result.user.role,
             createdAt: result.user.createdAt,
-            updatedAt: result.user.updatedAt
-          }
-        }
+            updatedAt: result.user.updatedAt,
+          },
+        },
       });
     } catch (error) {
       next(error);
@@ -94,20 +102,24 @@ export class AuthController {
    * Clear authentication token
    * Requirements: 2.4
    */
-  logout = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  logout = async (
+    _req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       await this.authService.logout();
-      
+
       // Clear the JWT cookie
       res.clearCookie('authToken', {
         httpOnly: true,
         secure: process.env['NODE_ENV'] === 'production',
-        sameSite: 'strict'
+        sameSite: 'strict',
       });
 
       res.status(200).json({
         success: true,
-        message: 'Logout successful'
+        message: 'Logout successful',
       });
     } catch (error) {
       next(error);

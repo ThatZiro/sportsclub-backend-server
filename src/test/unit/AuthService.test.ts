@@ -3,7 +3,11 @@
  * Tests authentication service with mocked dependencies
  */
 
-import { AuthService, AuthenticationError, ValidationError } from '../../application/services/AuthService';
+import {
+  AuthService,
+  AuthenticationError,
+  ValidationError,
+} from '../../application/services/AuthService';
 import { IUserRepository } from '../../infrastructure/repositories/interfaces';
 import { UserRole } from '../../domain/enums';
 import bcrypt from 'bcrypt';
@@ -28,7 +32,7 @@ describe('AuthService', () => {
       findByEmail: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      findAll: jest.fn()
+      findAll: jest.fn(),
     };
     authService = new AuthService(mockUserRepo);
   });
@@ -37,14 +41,14 @@ describe('AuthService', () => {
     const validSignupData = {
       email: 'test@example.com',
       password: 'password123',
-      name: 'Test User'
+      name: 'Test User',
     };
 
     it('should create a new user successfully', async () => {
       // Arrange
       mockUserRepo.findByEmail.mockResolvedValue(null);
       mockBcrypt.hash.mockResolvedValue('hashedpassword' as never);
-      
+
       const createdUser = {
         id: 'user-1',
         email: validSignupData.email,
@@ -52,9 +56,9 @@ describe('AuthService', () => {
         name: validSignupData.name,
         role: UserRole.USER,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
-      
+
       mockUserRepo.create.mockResolvedValue(createdUser);
       mockJwt.sign.mockReturnValue('jwt-token' as never);
 
@@ -62,12 +66,17 @@ describe('AuthService', () => {
       const result = await authService.signup(validSignupData);
 
       // Assert
-      expect(mockUserRepo.findByEmail).toHaveBeenCalledWith(validSignupData.email);
-      expect(mockBcrypt.hash).toHaveBeenCalledWith(validSignupData.password, 12);
+      expect(mockUserRepo.findByEmail).toHaveBeenCalledWith(
+        validSignupData.email
+      );
+      expect(mockBcrypt.hash).toHaveBeenCalledWith(
+        validSignupData.password,
+        12
+      );
       expect(mockUserRepo.create).toHaveBeenCalledWith({
         email: validSignupData.email,
         passwordHash: 'hashedpassword',
-        name: validSignupData.name
+        name: validSignupData.name,
       });
       expect(result.user).toEqual(createdUser);
       expect(result.token).toBe('jwt-token');
@@ -82,15 +91,16 @@ describe('AuthService', () => {
         name: 'Existing User',
         role: UserRole.USER,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
-      
+
       mockUserRepo.findByEmail.mockResolvedValue(existingUser);
 
       // Act & Assert
-      await expect(authService.signup(validSignupData))
-        .rejects.toThrow(ValidationError);
-      
+      await expect(authService.signup(validSignupData)).rejects.toThrow(
+        ValidationError
+      );
+
       expect(mockUserRepo.create).not.toHaveBeenCalled();
     });
 
@@ -99,8 +109,9 @@ describe('AuthService', () => {
       const invalidData = { ...validSignupData, email: 'invalid-email' };
 
       // Act & Assert
-      await expect(authService.signup(invalidData))
-        .rejects.toThrow(ValidationError);
+      await expect(authService.signup(invalidData)).rejects.toThrow(
+        ValidationError
+      );
     });
 
     it('should validate password strength', async () => {
@@ -108,15 +119,16 @@ describe('AuthService', () => {
       const weakPasswordData = { ...validSignupData, password: 'weak' };
 
       // Act & Assert
-      await expect(authService.signup(weakPasswordData))
-        .rejects.toThrow(ValidationError);
+      await expect(authService.signup(weakPasswordData)).rejects.toThrow(
+        ValidationError
+      );
     });
   });
 
   describe('login', () => {
     const loginData = {
       email: 'test@example.com',
-      password: 'password123'
+      password: 'password123',
     };
 
     it('should login successfully with valid credentials', async () => {
@@ -128,7 +140,7 @@ describe('AuthService', () => {
         name: 'Test User',
         role: UserRole.USER,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockUserRepo.findByEmail.mockResolvedValue(user);
@@ -140,7 +152,10 @@ describe('AuthService', () => {
 
       // Assert
       expect(mockUserRepo.findByEmail).toHaveBeenCalledWith(loginData.email);
-      expect(mockBcrypt.compare).toHaveBeenCalledWith(loginData.password, user.passwordHash);
+      expect(mockBcrypt.compare).toHaveBeenCalledWith(
+        loginData.password,
+        user.passwordHash
+      );
       expect(result.user).toEqual(user);
       expect(result.token).toBe('jwt-token');
     });
@@ -150,8 +165,9 @@ describe('AuthService', () => {
       mockUserRepo.findByEmail.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(authService.login(loginData))
-        .rejects.toThrow(AuthenticationError);
+      await expect(authService.login(loginData)).rejects.toThrow(
+        AuthenticationError
+      );
     });
 
     it('should throw error for invalid password', async () => {
@@ -163,15 +179,16 @@ describe('AuthService', () => {
         name: 'Test User',
         role: UserRole.USER,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockUserRepo.findByEmail.mockResolvedValue(user);
       mockBcrypt.compare.mockResolvedValue(false as never);
 
       // Act & Assert
-      await expect(authService.login(loginData))
-        .rejects.toThrow(AuthenticationError);
+      await expect(authService.login(loginData)).rejects.toThrow(
+        AuthenticationError
+      );
     });
   });
 
@@ -186,7 +203,7 @@ describe('AuthService', () => {
         name: 'Test User',
         role: UserRole.USER,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockJwt.verify.mockReturnValue(payload as never);
@@ -196,7 +213,10 @@ describe('AuthService', () => {
       const result = await authService.validateToken('valid-token');
 
       // Assert
-      expect(mockJwt.verify).toHaveBeenCalledWith('valid-token', process.env['JWT_SECRET']);
+      expect(mockJwt.verify).toHaveBeenCalledWith(
+        'valid-token',
+        process.env['JWT_SECRET']
+      );
       expect(mockUserRepo.findById).toHaveBeenCalledWith('user-1');
       expect(result).toEqual(user);
     });
@@ -208,8 +228,9 @@ describe('AuthService', () => {
       });
 
       // Act & Assert
-      await expect(authService.validateToken('invalid-token'))
-        .rejects.toThrow(AuthenticationError);
+      await expect(authService.validateToken('invalid-token')).rejects.toThrow(
+        AuthenticationError
+      );
     });
 
     it('should throw error if user not found', async () => {
@@ -219,8 +240,9 @@ describe('AuthService', () => {
       mockUserRepo.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(authService.validateToken('valid-token'))
-        .rejects.toThrow(AuthenticationError);
+      await expect(authService.validateToken('valid-token')).rejects.toThrow(
+        AuthenticationError
+      );
     });
   });
 });

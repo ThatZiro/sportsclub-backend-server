@@ -3,18 +3,13 @@
  * Centralizes all entity exports for easy importing
  */
 
-export {
-  User,
-  CreateUserData,
-  UpdateUserData,
-  UserDomain
-} from './User';
+export { User, CreateUserData, UpdateUserData, UserDomain } from './User';
 
 export {
   League,
   CreateLeagueData,
   UpdateLeagueData,
-  LeagueDomain
+  LeagueDomain,
 } from './League';
 
 export {
@@ -22,7 +17,7 @@ export {
   CreateTeamData,
   UpdateTeamData,
   TeamSummary,
-  TeamDomain
+  TeamDomain,
 } from './Team';
 
 export {
@@ -30,5 +25,5 @@ export {
   CreateTeamMemberData,
   UpdateTeamMemberData,
   TeamMemberWithUser,
-  TeamMemberDomain
+  TeamMemberDomain,
 } from './TeamMember';

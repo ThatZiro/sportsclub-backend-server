@@ -12,21 +12,22 @@ const swaggerDefinition: SwaggerDefinition = {
   info: {
     title: 'PBSportsClub API',
     version: '1.0.0',
-    description: 'A minimal TypeScript/Node.js backend for sports league player registration',
+    description:
+      'A minimal TypeScript/Node.js backend for sports league player registration',
     contact: {
       name: 'API Support',
-      email: 'support@pbsportsclub.com'
+      email: 'support@pbsportsclub.com',
     },
     license: {
       name: 'MIT',
-      url: 'https://opensource.org/licenses/MIT'
-    }
+      url: 'https://opensource.org/licenses/MIT',
+    },
   },
   servers: [
     {
       url: process.env['API_BASE_URL'] || 'http://localhost:3000',
-      description: 'Development server'
-    }
+      description: 'Development server',
+    },
   ],
   components: {
     securitySchemes: {
@@ -34,8 +35,8 @@ const swaggerDefinition: SwaggerDefinition = {
         type: 'apiKey',
         in: 'cookie',
         name: 'token',
-        description: 'JWT token stored in HTTP-only cookie'
-      }
+        description: 'JWT token stored in HTTP-only cookie',
+      },
     },
     schemas: {
       // User schemas
@@ -45,39 +46,39 @@ const swaggerDefinition: SwaggerDefinition = {
           id: {
             type: 'string',
             description: 'Unique user identifier',
-            example: 'clw1234567890abcdef'
+            example: 'clw1234567890abcdef',
           },
           email: {
             type: 'string',
             format: 'email',
             description: 'User email address',
-            example: 'john.doe@example.com'
+            example: 'john.doe@example.com',
           },
           name: {
             type: 'string',
             description: 'User full name',
-            example: 'John Doe'
+            example: 'John Doe',
           },
           role: {
             type: 'string',
             enum: ['USER', 'ORGANIZER', 'ADMIN'],
             description: 'User role in the system',
-            example: 'USER'
+            example: 'USER',
           },
           createdAt: {
             type: 'string',
             format: 'date-time',
-            description: 'Account creation timestamp'
+            description: 'Account creation timestamp',
           },
           updatedAt: {
             type: 'string',
             format: 'date-time',
-            description: 'Last profile update timestamp'
-          }
+            description: 'Last profile update timestamp',
+          },
         },
-        required: ['id', 'email', 'name', 'role']
+        required: ['id', 'email', 'name', 'role'],
       },
-      
+
       // League schemas
       League: {
         type: 'object',
@@ -85,43 +86,43 @@ const swaggerDefinition: SwaggerDefinition = {
           id: {
             type: 'string',
             description: 'Unique league identifier',
-            example: 'clw1234567890abcdef'
+            example: 'clw1234567890abcdef',
           },
           name: {
             type: 'string',
             description: 'League name',
-            example: 'Spring 2024 Basketball League'
+            example: 'Spring 2024 Basketball League',
           },
           slug: {
             type: 'string',
             description: 'URL-friendly league identifier',
-            example: 'spring-2024-basketball'
+            example: 'spring-2024-basketball',
           },
           season: {
             type: 'string',
             nullable: true,
             description: 'League season',
-            example: 'Spring 2024'
+            example: 'Spring 2024',
           },
           isActive: {
             type: 'boolean',
             description: 'Whether the league is currently active',
-            example: true
+            example: true,
           },
           createdAt: {
             type: 'string',
             format: 'date-time',
-            description: 'League creation timestamp'
+            description: 'League creation timestamp',
           },
           updatedAt: {
             type: 'string',
             format: 'date-time',
-            description: 'Last league update timestamp'
-          }
+            description: 'Last league update timestamp',
+          },
         },
-        required: ['id', 'name', 'slug', 'isActive']
+        required: ['id', 'name', 'slug', 'isActive'],
       },
-      
+
       // Team schemas
       Team: {
         type: 'object',
@@ -129,38 +130,38 @@ const swaggerDefinition: SwaggerDefinition = {
           id: {
             type: 'string',
             description: 'Unique team identifier',
-            example: 'clw1234567890abcdef'
+            example: 'clw1234567890abcdef',
           },
           name: {
             type: 'string',
             description: 'Team name',
-            example: 'Thunder Bolts'
+            example: 'Thunder Bolts',
           },
           color: {
             type: 'string',
             nullable: true,
             description: 'Team color',
-            example: '#FF5733'
+            example: '#FF5733',
           },
           leagueId: {
             type: 'string',
             description: 'League identifier this team belongs to',
-            example: 'clw1234567890abcdef'
+            example: 'clw1234567890abcdef',
           },
           captainId: {
             type: 'string',
             description: 'User ID of the team captain',
-            example: 'clw1234567890abcdef'
+            example: 'clw1234567890abcdef',
           },
           createdAt: {
             type: 'string',
             format: 'date-time',
-            description: 'Team creation timestamp'
-          }
+            description: 'Team creation timestamp',
+          },
         },
-        required: ['id', 'name', 'leagueId', 'captainId']
+        required: ['id', 'name', 'leagueId', 'captainId'],
       },
-      
+
       TeamWithMembers: {
         allOf: [
           { $ref: '#/components/schemas/Team' },
@@ -168,52 +169,52 @@ const swaggerDefinition: SwaggerDefinition = {
             type: 'object',
             properties: {
               captain: {
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/User',
               },
               members: {
                 type: 'array',
                 items: {
-                  $ref: '#/components/schemas/TeamMemberWithUser'
-                }
+                  $ref: '#/components/schemas/TeamMemberWithUser',
+                },
               },
               memberCount: {
                 type: 'number',
                 description: 'Total number of approved members',
-                example: 5
-              }
-            }
-          }
-        ]
+                example: 5,
+              },
+            },
+          },
+        ],
       },
-      
+
       TeamSummary: {
         type: 'object',
         properties: {
           id: {
             type: 'string',
-            example: 'clw1234567890abcdef'
+            example: 'clw1234567890abcdef',
           },
           name: {
             type: 'string',
-            example: 'Thunder Bolts'
+            example: 'Thunder Bolts',
           },
           color: {
             type: 'string',
             nullable: true,
-            example: '#FF5733'
+            example: '#FF5733',
           },
           captainName: {
             type: 'string',
-            example: 'John Doe'
+            example: 'John Doe',
           },
           memberCount: {
             type: 'number',
-            example: 5
-          }
+            example: 5,
+          },
         },
-        required: ['id', 'name', 'captainName', 'memberCount']
+        required: ['id', 'name', 'captainName', 'memberCount'],
       },
-      
+
       // TeamMember schemas
       TeamMember: {
         type: 'object',
@@ -221,39 +222,39 @@ const swaggerDefinition: SwaggerDefinition = {
           id: {
             type: 'string',
             description: 'Unique membership identifier',
-            example: 'clw1234567890abcdef'
+            example: 'clw1234567890abcdef',
           },
           teamId: {
             type: 'string',
             description: 'Team identifier',
-            example: 'clw1234567890abcdef'
+            example: 'clw1234567890abcdef',
           },
           userId: {
             type: 'string',
             description: 'User identifier',
-            example: 'clw1234567890abcdef'
+            example: 'clw1234567890abcdef',
           },
           role: {
             type: 'string',
             enum: ['CAPTAIN', 'MEMBER'],
             description: 'Member role in the team',
-            example: 'MEMBER'
+            example: 'MEMBER',
           },
           status: {
             type: 'string',
             enum: ['PENDING', 'APPROVED', 'REJECTED'],
             description: 'Membership status',
-            example: 'APPROVED'
+            example: 'APPROVED',
           },
           createdAt: {
             type: 'string',
             format: 'date-time',
-            description: 'Membership creation timestamp'
-          }
+            description: 'Membership creation timestamp',
+          },
         },
-        required: ['id', 'teamId', 'userId', 'role', 'status']
+        required: ['id', 'teamId', 'userId', 'role', 'status'],
       },
-      
+
       TeamMemberWithUser: {
         allOf: [
           { $ref: '#/components/schemas/TeamMember' },
@@ -261,13 +262,13 @@ const swaggerDefinition: SwaggerDefinition = {
             type: 'object',
             properties: {
               user: {
-                $ref: '#/components/schemas/User'
-              }
-            }
-          }
-        ]
+                $ref: '#/components/schemas/User',
+              },
+            },
+          },
+        ],
       },
-      
+
       // Request/Response DTOs
       SignupRequest: {
         type: 'object',
@@ -276,24 +277,24 @@ const swaggerDefinition: SwaggerDefinition = {
             type: 'string',
             format: 'email',
             description: 'User email address',
-            example: 'john.doe@example.com'
+            example: 'john.doe@example.com',
           },
           password: {
             type: 'string',
             minLength: 8,
             description: 'User password (minimum 8 characters)',
-            example: 'securePassword123'
+            example: 'securePassword123',
           },
           name: {
             type: 'string',
             minLength: 1,
             description: 'User full name',
-            example: 'John Doe'
-          }
+            example: 'John Doe',
+          },
         },
-        required: ['email', 'password', 'name']
+        required: ['email', 'password', 'name'],
       },
-      
+
       LoginRequest: {
         type: 'object',
         properties: {
@@ -301,17 +302,17 @@ const swaggerDefinition: SwaggerDefinition = {
             type: 'string',
             format: 'email',
             description: 'User email address',
-            example: 'john.doe@example.com'
+            example: 'john.doe@example.com',
           },
           password: {
             type: 'string',
             description: 'User password',
-            example: 'securePassword123'
-          }
+            example: 'securePassword123',
+          },
         },
-        required: ['email', 'password']
+        required: ['email', 'password'],
       },
-      
+
       CreateTeamRequest: {
         type: 'object',
         properties: {
@@ -319,23 +320,23 @@ const swaggerDefinition: SwaggerDefinition = {
             type: 'string',
             minLength: 1,
             description: 'Team name',
-            example: 'Thunder Bolts'
+            example: 'Thunder Bolts',
           },
           color: {
             type: 'string',
             nullable: true,
             description: 'Team color (hex code)',
-            example: '#FF5733'
+            example: '#FF5733',
           },
           leagueId: {
             type: 'string',
             description: 'League identifier',
-            example: 'clw1234567890abcdef'
-          }
+            example: 'clw1234567890abcdef',
+          },
         },
-        required: ['name', 'leagueId']
+        required: ['name', 'leagueId'],
       },
-      
+
       CreateLeagueRequest: {
         type: 'object',
         properties: {
@@ -343,29 +344,29 @@ const swaggerDefinition: SwaggerDefinition = {
             type: 'string',
             minLength: 1,
             description: 'League name',
-            example: 'Spring 2024 Basketball League'
+            example: 'Spring 2024 Basketball League',
           },
           slug: {
             type: 'string',
             minLength: 1,
             description: 'URL-friendly identifier',
-            example: 'spring-2024-basketball'
+            example: 'spring-2024-basketball',
           },
           season: {
             type: 'string',
             nullable: true,
             description: 'League season',
-            example: 'Spring 2024'
+            example: 'Spring 2024',
           },
           isActive: {
             type: 'boolean',
             description: 'Whether the league is active',
-            example: true
-          }
+            example: true,
+          },
         },
-        required: ['name', 'slug']
+        required: ['name', 'slug'],
       },
-      
+
       UpdateUserRequest: {
         type: 'object',
         properties: {
@@ -373,81 +374,81 @@ const swaggerDefinition: SwaggerDefinition = {
             type: 'string',
             minLength: 1,
             description: 'Updated user name',
-            example: 'John Smith'
+            example: 'John Smith',
           },
           email: {
             type: 'string',
             format: 'email',
             description: 'Updated email address',
-            example: 'john.smith@example.com'
-          }
-        }
+            example: 'john.smith@example.com',
+          },
+        },
       },
-      
+
       // Response schemas
       AuthResponse: {
         type: 'object',
         properties: {
           success: {
             type: 'boolean',
-            example: true
+            example: true,
           },
           message: {
             type: 'string',
-            example: 'Authentication successful'
+            example: 'Authentication successful',
           },
           user: {
-            $ref: '#/components/schemas/User'
-          }
+            $ref: '#/components/schemas/User',
+          },
         },
-        required: ['success', 'message', 'user']
+        required: ['success', 'message', 'user'],
       },
-      
+
       SuccessResponse: {
         type: 'object',
         properties: {
           success: {
             type: 'boolean',
-            example: true
+            example: true,
           },
           message: {
             type: 'string',
-            example: 'Operation completed successfully'
-          }
+            example: 'Operation completed successfully',
+          },
         },
-        required: ['success', 'message']
+        required: ['success', 'message'],
       },
-      
+
       ErrorResponse: {
         type: 'object',
         properties: {
           success: {
             type: 'boolean',
-            example: false
+            example: false,
           },
           message: {
             type: 'string',
-            example: 'An error occurred'
+            example: 'An error occurred',
           },
           error: {
             type: 'string',
             description: 'Error details (development only)',
-            example: 'Validation failed'
-          }
+            example: 'Validation failed',
+          },
         },
-        required: ['success', 'message']
+        required: ['success', 'message'],
       },
-      
+
       ValidationErrorResponse: {
         type: 'object',
         properties: {
           success: {
             type: 'boolean',
-            example: false
+            example: false,
           },
           message: {
             type: 'string',
-            example: 'Validation failed'
+            example: 'Validation failed',
           },
           errors: {
             type: 'array',
@@ -456,129 +457,126 @@ const swaggerDefinition: SwaggerDefinition = {
               properties: {
                 field: {
                   type: 'string',
-                  example: 'email'
+                  example: 'email',
                 },
                 message: {
                   type: 'string',
-                  example: 'Invalid email format'
-                }
-              }
-            }
-          }
+                  example: 'Invalid email format',
+                },
+              },
+            },
+          },
         },
-        required: ['success', 'message', 'errors']
-      }
+        required: ['success', 'message', 'errors'],
+      },
     },
-    
+
     responses: {
       UnauthorizedError: {
         description: 'Authentication required',
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/ErrorResponse'
+              $ref: '#/components/schemas/ErrorResponse',
             },
             example: {
               success: false,
-              message: 'Authentication required'
-            }
-          }
-        }
+              message: 'Authentication required',
+            },
+          },
+        },
       },
-      
+
       ForbiddenError: {
         description: 'Insufficient permissions',
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/ErrorResponse'
+              $ref: '#/components/schemas/ErrorResponse',
             },
             example: {
               success: false,
-              message: 'Insufficient permissions'
-            }
-          }
-        }
+              message: 'Insufficient permissions',
+            },
+          },
+        },
       },
-      
+
       NotFoundError: {
         description: 'Resource not found',
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/ErrorResponse'
+              $ref: '#/components/schemas/ErrorResponse',
             },
             example: {
               success: false,
-              message: 'Resource not found'
-            }
-          }
-        }
+              message: 'Resource not found',
+            },
+          },
+        },
       },
-      
+
       ValidationError: {
         description: 'Validation failed',
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/ValidationErrorResponse'
-            }
-          }
-        }
+              $ref: '#/components/schemas/ValidationErrorResponse',
+            },
+          },
+        },
       },
-      
+
       RateLimitError: {
         description: 'Rate limit exceeded',
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/ErrorResponse'
+              $ref: '#/components/schemas/ErrorResponse',
             },
             example: {
               success: false,
-              message: 'Too many requests, please try again later'
-            }
-          }
-        }
-      }
-    }
+              message: 'Too many requests, please try again later',
+            },
+          },
+        },
+      },
+    },
   },
-  
+
   tags: [
     {
       name: 'Authentication',
-      description: 'User authentication and authorization endpoints'
+      description: 'User authentication and authorization endpoints',
     },
     {
       name: 'User Profile',
-      description: 'User profile management endpoints'
+      description: 'User profile management endpoints',
     },
     {
       name: 'Leagues',
-      description: 'League management endpoints (organizer/admin only)'
+      description: 'League management endpoints (organizer/admin only)',
     },
     {
       name: 'Teams',
-      description: 'Team management and membership endpoints'
+      description: 'Team management and membership endpoints',
     },
     {
       name: 'Public',
-      description: 'Public endpoints for league and team information'
+      description: 'Public endpoints for league and team information',
     },
     {
       name: 'System',
-      description: 'System health and status endpoints'
-    }
-  ]
+      description: 'System health and status endpoints',
+    },
+  ],
 };
 
 // Swagger JSDoc options
 const swaggerOptions = {
   definition: swaggerDefinition,
-  apis: [
-    './src/api/routes/*.ts',
-    './src/api/controllers/*.ts'
-  ]
+  apis: ['./src/api/routes/*.ts', './src/api/controllers/*.ts'],
 };
 
 // Generate swagger specification

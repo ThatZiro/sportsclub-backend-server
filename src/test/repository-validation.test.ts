@@ -8,7 +8,7 @@ import {
   UserRepository,
   LeagueRepository,
   TeamRepository,
-  TeamMemberRepository
+  TeamMemberRepository,
 } from '../infrastructure/repositories';
 
 // Mock Prisma to avoid database connection
@@ -19,14 +19,14 @@ jest.mock('../infrastructure/database', () => ({
       findUnique: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      findMany: jest.fn()
+      findMany: jest.fn(),
     },
     league: {
       create: jest.fn(),
       findUnique: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      findMany: jest.fn()
+      findMany: jest.fn(),
     },
     team: {
       create: jest.fn(),
@@ -34,7 +34,7 @@ jest.mock('../infrastructure/database', () => ({
       findMany: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      findFirst: jest.fn()
+      findFirst: jest.fn(),
     },
     teamMember: {
       create: jest.fn(),
@@ -42,9 +42,9 @@ jest.mock('../infrastructure/database', () => ({
       findMany: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      count: jest.fn()
-    }
-  }
+      count: jest.fn(),
+    },
+  },
 }));
 
 describe('Repository Validation Tests', () => {
@@ -65,18 +65,22 @@ describe('Repository Validation Tests', () => {
       const invalidData = {
         email: 'invalid-email',
         passwordHash: '',
-        name: ''
+        name: '',
       };
 
-      await expect(userRepo.create(invalidData)).rejects.toThrow('Validation failed');
+      await expect(userRepo.create(invalidData)).rejects.toThrow(
+        'Validation failed'
+      );
     });
 
     it('should reject invalid user update data', async () => {
       const invalidData = {
-        email: 'invalid-email'
+        email: 'invalid-email',
       };
 
-      await expect(userRepo.update('test-id', invalidData)).rejects.toThrow('Validation failed');
+      await expect(userRepo.update('test-id', invalidData)).rejects.toThrow(
+        'Validation failed'
+      );
     });
   });
 
@@ -84,18 +88,22 @@ describe('Repository Validation Tests', () => {
     it('should reject invalid league creation data', async () => {
       const invalidData = {
         name: 'A', // Too short
-        slug: 'invalid slug with spaces'
+        slug: 'invalid slug with spaces',
       };
 
-      await expect(leagueRepo.create(invalidData)).rejects.toThrow('Validation failed');
+      await expect(leagueRepo.create(invalidData)).rejects.toThrow(
+        'Validation failed'
+      );
     });
 
     it('should reject invalid league update data', async () => {
       const invalidData = {
-        name: 'A' // Too short
+        name: 'A', // Too short
       };
 
-      await expect(leagueRepo.update('test-id', invalidData)).rejects.toThrow('Validation failed');
+      await expect(leagueRepo.update('test-id', invalidData)).rejects.toThrow(
+        'Validation failed'
+      );
     });
   });
 
@@ -105,19 +113,23 @@ describe('Repository Validation Tests', () => {
         name: 'A', // Too short
         color: 'invalid-color',
         leagueId: 'invalid-id',
-        captainId: 'invalid-id'
+        captainId: 'invalid-id',
       };
 
-      await expect(teamRepo.create(invalidData)).rejects.toThrow('Validation failed');
+      await expect(teamRepo.create(invalidData)).rejects.toThrow(
+        'Validation failed'
+      );
     });
 
     it('should reject invalid team update data', async () => {
       const invalidData = {
         name: 'A', // Too short
-        color: 'invalid-color'
+        color: 'invalid-color',
       };
 
-      await expect(teamRepo.update('test-id', invalidData)).rejects.toThrow('Validation failed');
+      await expect(teamRepo.update('test-id', invalidData)).rejects.toThrow(
+        'Validation failed'
+      );
     });
   });
 
@@ -125,10 +137,12 @@ describe('Repository Validation Tests', () => {
     it('should reject invalid team member creation data', async () => {
       const invalidData = {
         teamId: 'invalid-id',
-        userId: 'invalid-id'
+        userId: 'invalid-id',
       };
 
-      await expect(memberRepo.create(invalidData)).rejects.toThrow('Validation failed');
+      await expect(memberRepo.create(invalidData)).rejects.toThrow(
+        'Validation failed'
+      );
     });
   });
 });

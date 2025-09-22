@@ -84,7 +84,9 @@ export class LeagueDomain {
     }
 
     if (!data.slug || !this.isValidSlug(data.slug)) {
-      errors.push('League slug must be 3-50 characters, lowercase alphanumeric with hyphens');
+      errors.push(
+        'League slug must be 3-50 characters, lowercase alphanumeric with hyphens'
+      );
     }
 
     if (data.season && !this.isValidSeason(data.season)) {
@@ -105,10 +107,16 @@ export class LeagueDomain {
     }
 
     if (data.slug !== undefined && !this.isValidSlug(data.slug)) {
-      errors.push('League slug must be 3-50 characters, lowercase alphanumeric with hyphens');
+      errors.push(
+        'League slug must be 3-50 characters, lowercase alphanumeric with hyphens'
+      );
     }
 
-    if (data.season !== undefined && data.season !== null && !this.isValidSeason(data.season)) {
+    if (
+      data.season !== undefined &&
+      data.season !== null &&
+      !this.isValidSeason(data.season)
+    ) {
       errors.push('Season must be between 4 and 20 characters');
     }
 
@@ -125,11 +133,13 @@ export class LeagueDomain {
   /**
    * Creates league data with auto-generated slug if not provided
    */
-  static prepareCreateData(data: Omit<CreateLeagueData, 'slug'> & { slug?: string }): CreateLeagueData {
+  static prepareCreateData(
+    data: Omit<CreateLeagueData, 'slug'> & { slug?: string }
+  ): CreateLeagueData {
     return {
       ...data,
       slug: data.slug || this.generateSlug(data.name),
-      isActive: data.isActive ?? true
+      isActive: data.isActive ?? true,
     };
   }
 }

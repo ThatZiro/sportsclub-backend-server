@@ -3,7 +3,10 @@
  * Handles retrieving database credentials from AWS Secrets Manager
  */
 
-import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from '@aws-sdk/client-secrets-manager';
 
 interface DatabaseCredentials {
   username: string;
@@ -25,20 +28,22 @@ class AWSSecretsManager {
   /**
    * Retrieve database credentials from AWS Secrets Manager
    */
-  async getDatabaseCredentials(secretArn: string): Promise<DatabaseCredentials> {
+  async getDatabaseCredentials(
+    secretArn: string
+  ): Promise<DatabaseCredentials> {
     try {
       const command = new GetSecretValueCommand({
         SecretId: secretArn,
       });
 
       const response = await this.client.send(command);
-      
+
       if (!response.SecretString) {
         throw new Error('Secret value is empty');
       }
 
       const secret = JSON.parse(response.SecretString);
-      
+
       // AWS RDS secrets typically have this structure
       return {
         username: secret.username,
@@ -48,7 +53,10 @@ class AWSSecretsManager {
         dbname: secret.dbname || process.env['DB_NAME'] || 'pbsports',
       };
     } catch (error) {
-      console.error('Failed to retrieve database credentials from Secrets Manager:', error);
+      console.error(
+        'Failed to retrieve database credentials from Secrets Manager:',
+        error
+      );
       throw new Error(`Failed to retrieve database credentials: ${error}`);
     }
   }
@@ -58,7 +66,7 @@ class AWSSecretsManager {
    */
   async buildDatabaseUrl(secretArn: string): Promise<string> {
     const credentials = await this.getDatabaseCredentials(secretArn);
-    
+
     return `postgresql://${credentials.username}:${credentials.password}@${credentials.host}:${credentials.port}/${credentials.dbname}`;
   }
 }
@@ -87,7 +95,9 @@ export async function getDatabaseUrl(): Promise<string> {
   const dbname = process.env['DB_NAME'] || 'pbsports';
 
   if (!host || !username || !password) {
-    throw new Error('Database configuration is incomplete. Set DATABASE_URL, AWS_SECRET_ARN, or individual DB_* variables.');
+    throw new Error(
+      'Database configuration is incomplete. Set DATABASE_URL, AWS_SECRET_ARN, or individual DB_* variables.'
+    );
   }
 
   return `postgresql://${username}:${password}@${host}:${port}/${dbname}`;

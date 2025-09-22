@@ -11,7 +11,7 @@ export const authRateLimiter = rateLimit({
   message: {
     error: 'Too many requests',
     message: 'Too many authentication attempts. Please try again later.',
-    retryAfter: 60
+    retryAfter: 60,
   },
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
@@ -19,13 +19,13 @@ export const authRateLimiter = rateLimit({
     res.status(429).json({
       error: 'Too many requests',
       message: 'Too many authentication attempts. Please try again later.',
-      retryAfter: 60
+      retryAfter: 60,
     });
   },
   skip: (_req: Request) => {
     // Skip rate limiting in test environment
     return process.env['NODE_ENV'] === 'test';
-  }
+  },
 });
 
 /**
@@ -38,7 +38,7 @@ export const apiRateLimiter = rateLimit({
   message: {
     error: 'Too many requests',
     message: 'Too many API requests. Please try again later.',
-    retryAfter: 60
+    retryAfter: 60,
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -46,13 +46,13 @@ export const apiRateLimiter = rateLimit({
     res.status(429).json({
       error: 'Too many requests',
       message: 'Too many API requests. Please try again later.',
-      retryAfter: 60
+      retryAfter: 60,
     });
   },
   skip: (_req: Request) => {
     // Skip rate limiting in test environment
     return process.env['NODE_ENV'] === 'test';
-  }
+  },
 });
 
 /**
@@ -64,22 +64,24 @@ export const strictRateLimiter = rateLimit({
   max: 5, // Limit each IP to 5 requests per windowMs
   message: {
     error: 'Too many requests',
-    message: 'Too many requests for this sensitive operation. Please try again later.',
-    retryAfter: 60
+    message:
+      'Too many requests for this sensitive operation. Please try again later.',
+    retryAfter: 60,
   },
   standardHeaders: true,
   legacyHeaders: false,
   handler: (_req: Request, res: Response) => {
     res.status(429).json({
       error: 'Too many requests',
-      message: 'Too many requests for this sensitive operation. Please try again later.',
-      retryAfter: 60
+      message:
+        'Too many requests for this sensitive operation. Please try again later.',
+      retryAfter: 60,
     });
   },
   skip: (_req: Request) => {
     // Skip rate limiting in test environment
     return process.env['NODE_ENV'] === 'test';
-  }
+  },
 });
 
 /**
@@ -96,19 +98,20 @@ export const createRateLimiter = (options: {
     message: {
       error: 'Too many requests',
       message: options.message || 'Too many requests. Please try again later.',
-      retryAfter: Math.ceil(options.windowMs / 1000)
+      retryAfter: Math.ceil(options.windowMs / 1000),
     },
     standardHeaders: true,
     legacyHeaders: false,
     handler: (_req: Request, res: Response) => {
       res.status(429).json({
         error: 'Too many requests',
-        message: options.message || 'Too many requests. Please try again later.',
-        retryAfter: Math.ceil(options.windowMs / 1000)
+        message:
+          options.message || 'Too many requests. Please try again later.',
+        retryAfter: Math.ceil(options.windowMs / 1000),
       });
     },
     skip: (_req: Request) => {
       return process.env['NODE_ENV'] === 'test';
-    }
+    },
   });
 };

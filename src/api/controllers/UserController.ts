@@ -17,12 +17,16 @@ export class UserController {
    * Get current user profile
    * Requirements: 2.3
    */
-  getProfile = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  getProfile = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       if (!req.user) {
         res.status(401).json({
           success: false,
-          message: 'Authentication required'
+          message: 'Authentication required',
         });
         return;
       }
@@ -33,8 +37,8 @@ export class UserController {
         success: true,
         message: 'User profile retrieved successfully',
         data: {
-          user: userProfile
-        }
+          user: userProfile,
+        },
       });
     } catch (error) {
       next(error);
@@ -46,26 +50,33 @@ export class UserController {
    * Update current user profile
    * Requirements: 2.3
    */
-  updateProfile = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  updateProfile = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       if (!req.user) {
         res.status(401).json({
           success: false,
-          message: 'Authentication required'
+          message: 'Authentication required',
         });
         return;
       }
 
       const { body } = req as UpdateUserProfileRequest;
-      
-      const updatedProfile = await this.userService.updateUserProfile(req.user.id, body);
+
+      const updatedProfile = await this.userService.updateUserProfile(
+        req.user.id,
+        body
+      );
 
       res.status(200).json({
         success: true,
         message: 'Profile updated successfully',
         data: {
-          user: updatedProfile
-        }
+          user: updatedProfile,
+        },
       });
     } catch (error) {
       next(error);

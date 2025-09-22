@@ -7,7 +7,7 @@
 import { Response, NextFunction } from 'express';
 import { LeagueService } from '../../application/services/LeagueService';
 import { AuthenticatedRequest } from '../middleware/auth';
-import { CreateLeagueRequest, UpdateLeagueRequest } from '../validators/league';
+import { CreateLeagueRequest } from '../validators/league';
 
 export class LeagueController {
   constructor(private leagueService: LeagueService) {}
@@ -17,26 +17,30 @@ export class LeagueController {
    * Create a new league (organizer only)
    * Requirements: 7.1
    */
-  createLeague = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  createLeague = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       if (!req.user) {
         res.status(401).json({
           success: false,
-          message: 'Authentication required'
+          message: 'Authentication required',
         });
         return;
       }
 
       const { body } = req as CreateLeagueRequest;
-      
+
       const league = await this.leagueService.createLeague(body, req.user.id);
 
       res.status(201).json({
         success: true,
         message: 'League created successfully',
         data: {
-          league
-        }
+          league,
+        },
       });
     } catch (error) {
       next(error);
@@ -48,12 +52,16 @@ export class LeagueController {
    * Get all leagues (organizer only)
    * Requirements: 7.2
    */
-  getAllLeagues = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  getAllLeagues = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       if (!req.user) {
         res.status(401).json({
           success: false,
-          message: 'Authentication required'
+          message: 'Authentication required',
         });
         return;
       }
@@ -64,8 +72,8 @@ export class LeagueController {
         success: true,
         message: 'Leagues retrieved successfully',
         data: {
-          leagues
-        }
+          leagues,
+        },
       });
     } catch (error) {
       next(error);
@@ -77,12 +85,16 @@ export class LeagueController {
    * Get league by ID (organizer only)
    * Requirements: 7.2
    */
-  getLeagueById = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  getLeagueById = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       if (!req.user) {
         res.status(401).json({
           success: false,
-          message: 'Authentication required'
+          message: 'Authentication required',
         });
         return;
       }
@@ -91,19 +103,22 @@ export class LeagueController {
       if (!leagueId) {
         res.status(400).json({
           success: false,
-          message: 'League ID is required'
+          message: 'League ID is required',
         });
         return;
       }
-      
-      const league = await this.leagueService.getLeagueById(leagueId, req.user.id);
+
+      const league = await this.leagueService.getLeagueById(
+        leagueId,
+        req.user.id
+      );
 
       res.status(200).json({
         success: true,
         message: 'League retrieved successfully',
         data: {
-          league
-        }
+          league,
+        },
       });
     } catch (error) {
       next(error);
@@ -115,12 +130,16 @@ export class LeagueController {
    * Update league (organizer only)
    * Requirements: 7.3
    */
-  updateLeague = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  updateLeague = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       if (!req.user) {
         res.status(401).json({
           success: false,
-          message: 'Authentication required'
+          message: 'Authentication required',
         });
         return;
       }
@@ -129,21 +148,25 @@ export class LeagueController {
       if (!leagueId) {
         res.status(400).json({
           success: false,
-          message: 'League ID is required'
+          message: 'League ID is required',
         });
         return;
       }
 
-      const { body } = req as UpdateLeagueRequest;
-      
-      const updatedLeague = await this.leagueService.updateLeague(leagueId, body, req.user.id);
+      const body = req.body;
+
+      const updatedLeague = await this.leagueService.updateLeague(
+        leagueId,
+        body,
+        req.user.id
+      );
 
       res.status(200).json({
         success: true,
         message: 'League updated successfully',
         data: {
-          league: updatedLeague
-        }
+          league: updatedLeague,
+        },
       });
     } catch (error) {
       next(error);
@@ -155,12 +178,16 @@ export class LeagueController {
    * Delete league (organizer only)
    * Requirements: 7.3
    */
-  deleteLeague = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  deleteLeague = async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       if (!req.user) {
         res.status(401).json({
           success: false,
-          message: 'Authentication required'
+          message: 'Authentication required',
         });
         return;
       }
@@ -169,16 +196,16 @@ export class LeagueController {
       if (!leagueId) {
         res.status(400).json({
           success: false,
-          message: 'League ID is required'
+          message: 'League ID is required',
         });
         return;
       }
-      
+
       await this.leagueService.deleteLeague(leagueId, req.user.id);
 
       res.status(200).json({
         success: true,
-        message: 'League deleted successfully'
+        message: 'League deleted successfully',
       });
     } catch (error) {
       next(error);

@@ -23,7 +23,12 @@ const teamRepository = new TeamRepository();
 const teamMemberRepository = new TeamMemberRepository();
 const userRepository = new UserRepository();
 const leagueService = new LeagueService(leagueRepository, userRepository);
-const teamService = new TeamService(teamRepository, teamMemberRepository, userRepository, leagueRepository);
+const teamService = new TeamService(
+  teamRepository,
+  teamMemberRepository,
+  userRepository,
+  leagueRepository
+);
 const publicController = new PublicController(leagueService, teamService);
 
 /**
@@ -59,7 +64,11 @@ const publicController = new PublicController(leagueService, teamService);
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/leagues/:slug', validate(leagueSlugParamSchema), publicController.getLeagueBySlug);
+router.get(
+  '/leagues/:slug',
+  validate(leagueSlugParamSchema),
+  publicController.getLeagueBySlug
+);
 
 /**
  * @swagger
@@ -103,6 +112,10 @@ router.get('/leagues/:slug', validate(leagueSlugParamSchema), publicController.g
  *               success: false
  *               message: League not found
  */
-router.get('/leagues/:slug/teams', validate(leagueSlugParamSchema), publicController.getTeamsByLeagueSlug);
+router.get(
+  '/leagues/:slug/teams',
+  validate(leagueSlugParamSchema),
+  publicController.getTeamsByLeagueSlug
+);
 
 export default router;

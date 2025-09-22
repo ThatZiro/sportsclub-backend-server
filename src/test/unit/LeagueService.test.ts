@@ -3,11 +3,11 @@
  * Tests league service with mocked dependencies
  */
 
-import { 
-  LeagueService, 
-  LeagueNotFoundError, 
-  LeagueValidationError, 
-  DuplicateLeagueSlugError 
+import {
+  LeagueService,
+  LeagueNotFoundError,
+  LeagueValidationError,
+  DuplicateLeagueSlugError,
 } from '../../application/services/LeagueService';
 import { ILeagueRepository } from '../../infrastructure/repositories/interfaces';
 
@@ -24,7 +24,7 @@ describe('LeagueService', () => {
       update: jest.fn(),
       delete: jest.fn(),
       findAll: jest.fn(),
-      findActive: jest.fn()
+      findActive: jest.fn(),
     };
     leagueService = new LeagueService(mockLeagueRepo);
   });
@@ -40,7 +40,7 @@ describe('LeagueService', () => {
         season: 'Spring 2024',
         isActive: true,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockLeagueRepo.findBySlug.mockResolvedValue(league);
@@ -59,15 +59,16 @@ describe('LeagueService', () => {
       mockLeagueRepo.findBySlug.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(leagueService.getLeagueBySlug(slug))
-        .rejects.toThrow(LeagueNotFoundError);
+      await expect(leagueService.getLeagueBySlug(slug)).rejects.toThrow(
+        LeagueNotFoundError
+      );
     });
   });
 
   describe('createLeague', () => {
     const leagueData = {
       name: 'New League',
-      season: 'Fall 2024'
+      season: 'Fall 2024',
     };
 
     it('should create league successfully', async () => {
@@ -79,7 +80,7 @@ describe('LeagueService', () => {
         season: leagueData.season,
         isActive: true,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockLeagueRepo.findBySlug.mockResolvedValue(null);
@@ -93,7 +94,7 @@ describe('LeagueService', () => {
       expect(mockLeagueRepo.create).toHaveBeenCalledWith({
         name: leagueData.name,
         slug: 'new-league',
-        season: leagueData.season
+        season: leagueData.season,
       });
       expect(result).toEqual(createdLeague);
     });
@@ -106,14 +107,15 @@ describe('LeagueService', () => {
         slug: 'new-league',
         isActive: true,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockLeagueRepo.findBySlug.mockResolvedValue(existingLeague);
 
       // Act & Assert
-      await expect(leagueService.createLeague(leagueData))
-        .rejects.toThrow(DuplicateLeagueSlugError);
+      await expect(leagueService.createLeague(leagueData)).rejects.toThrow(
+        DuplicateLeagueSlugError
+      );
     });
 
     it('should validate league name', async () => {
@@ -121,8 +123,9 @@ describe('LeagueService', () => {
       const invalidData = { ...leagueData, name: 'A' }; // Too short
 
       // Act & Assert
-      await expect(leagueService.createLeague(invalidData))
-        .rejects.toThrow(LeagueValidationError);
+      await expect(leagueService.createLeague(invalidData)).rejects.toThrow(
+        LeagueValidationError
+      );
     });
   });
 
@@ -135,21 +138,21 @@ describe('LeagueService', () => {
       season: 'Spring 2024',
       isActive: true,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     it('should update league successfully', async () => {
       // Arrange
       const updates = {
         name: 'Updated League',
-        season: 'Summer 2024'
+        season: 'Summer 2024',
       };
 
       const updatedLeague = {
         ...existingLeague,
         ...updates,
         slug: 'updated-league',
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockLeagueRepo.findById.mockResolvedValue(existingLeague);
@@ -163,7 +166,7 @@ describe('LeagueService', () => {
       expect(mockLeagueRepo.findById).toHaveBeenCalledWith(leagueId);
       expect(mockLeagueRepo.update).toHaveBeenCalledWith(leagueId, {
         ...updates,
-        slug: 'updated-league'
+        slug: 'updated-league',
       });
       expect(result).toEqual(updatedLeague);
     });
@@ -174,8 +177,9 @@ describe('LeagueService', () => {
       mockLeagueRepo.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(leagueService.updateLeague(leagueId, updates))
-        .rejects.toThrow(LeagueNotFoundError);
+      await expect(
+        leagueService.updateLeague(leagueId, updates)
+      ).rejects.toThrow(LeagueNotFoundError);
     });
   });
 
@@ -190,7 +194,7 @@ describe('LeagueService', () => {
         slug: 'test-league',
         isActive: true,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       mockLeagueRepo.findById.mockResolvedValue(league);
@@ -209,8 +213,9 @@ describe('LeagueService', () => {
       mockLeagueRepo.findById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(leagueService.deleteLeague(leagueId))
-        .rejects.toThrow(LeagueNotFoundError);
+      await expect(leagueService.deleteLeague(leagueId)).rejects.toThrow(
+        LeagueNotFoundError
+      );
     });
   });
 
@@ -224,7 +229,7 @@ describe('LeagueService', () => {
           slug: 'league-1',
           isActive: true,
           createdAt: new Date(),
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
         {
           id: 'league-2',
@@ -232,8 +237,8 @@ describe('LeagueService', () => {
           slug: 'league-2',
           isActive: false,
           createdAt: new Date(),
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       ];
 
       mockLeagueRepo.findAll.mockResolvedValue(leagues);

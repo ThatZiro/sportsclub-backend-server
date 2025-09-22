@@ -4,7 +4,11 @@
  */
 
 import { IUserRepository } from '../../infrastructure/repositories/interfaces';
-import { UpdateUserProfileDTO, UserProfileDTO, UpdateUserRoleDTO } from '../dtos/user.dto';
+import {
+  UpdateUserProfileDTO,
+  UserProfileDTO,
+  UpdateUserRoleDTO,
+} from '../dtos/user.dto';
 import { User, UpdateUserData } from '../../domain/entities';
 import { UserRole } from '../../domain/enums';
 
@@ -52,7 +56,10 @@ export class UserService {
    * Update user profile
    * Requirements: 2.3
    */
-  async updateUserProfile(userId: string, updates: UpdateUserProfileDTO): Promise<UserProfileDTO> {
+  async updateUserProfile(
+    userId: string,
+    updates: UpdateUserProfileDTO
+  ): Promise<UserProfileDTO> {
     // Check if user exists
     const existingUser = await this.userRepository.findById(userId);
     if (!existingUser) {
@@ -61,7 +68,9 @@ export class UserService {
 
     // If email is being updated, check for duplicates
     if (updates.email && updates.email !== existingUser.email) {
-      const userWithEmail = await this.userRepository.findByEmail(updates.email);
+      const userWithEmail = await this.userRepository.findByEmail(
+        updates.email
+      );
       if (userWithEmail) {
         throw new DuplicateEmailError(updates.email);
       }
@@ -78,7 +87,7 @@ export class UserService {
 
     // Update user
     const updatedUser = await this.userRepository.update(userId, updateData);
-    
+
     return this.mapToProfileDTO(updatedUser);
   }
 
@@ -86,7 +95,11 @@ export class UserService {
    * Update user role (admin/organizer functionality)
    * Requirements: 1.4
    */
-  async updateUserRole(userId: string, roleUpdate: UpdateUserRoleDTO, requestingUserId: string): Promise<UserProfileDTO> {
+  async updateUserRole(
+    userId: string,
+    roleUpdate: UpdateUserRoleDTO,
+    requestingUserId: string
+  ): Promise<UserProfileDTO> {
     // Check if requesting user exists and has permission
     const requestingUser = await this.userRepository.findById(requestingUserId);
     if (!requestingUser) {
@@ -94,8 +107,13 @@ export class UserService {
     }
 
     // Only ADMIN and ORGANIZER can update roles
-    if (requestingUser.role !== UserRole.ADMIN && requestingUser.role !== UserRole.ORGANIZER) {
-      throw new UserValidationError('Insufficient permissions to update user roles');
+    if (
+      requestingUser.role !== UserRole.ADMIN &&
+      requestingUser.role !== UserRole.ORGANIZER
+    ) {
+      throw new UserValidationError(
+        'Insufficient permissions to update user roles'
+      );
     }
 
     // Check if target user exists
@@ -111,11 +129,11 @@ export class UserService {
 
     // Update user role
     const updateData: UpdateUserData = {
-      role: roleUpdate.role
+      role: roleUpdate.role,
     };
 
     const updatedUser = await this.userRepository.update(userId, updateData);
-    
+
     return this.mapToProfileDTO(updatedUser);
   }
 
@@ -130,8 +148,13 @@ export class UserService {
       throw new UserNotFoundError(requestingUserId);
     }
 
-    if (requestingUser.role !== UserRole.ADMIN && requestingUser.role !== UserRole.ORGANIZER) {
-      throw new UserValidationError('Insufficient permissions to view all users');
+    if (
+      requestingUser.role !== UserRole.ADMIN &&
+      requestingUser.role !== UserRole.ORGANIZER
+    ) {
+      throw new UserValidationError(
+        'Insufficient permissions to view all users'
+      );
     }
 
     const users = await this.userRepository.findAll();
@@ -178,7 +201,7 @@ export class UserService {
       email: user.email,
       role: user.role,
       createdAt: user.createdAt,
-      updatedAt: user.updatedAt
+      updatedAt: user.updatedAt,
     };
   }
 }

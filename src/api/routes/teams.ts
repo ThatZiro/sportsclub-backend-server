@@ -12,12 +12,12 @@ import { UserRepository } from '../../infrastructure/repositories/UserRepository
 import { LeagueRepository } from '../../infrastructure/repositories/LeagueRepository';
 import { authMiddleware } from '../middleware/auth';
 import { validate } from '../middleware/validation';
-import { 
-  createTeamSchema, 
-  updateTeamSchema, 
+import {
+  createTeamSchema,
+  updateTeamSchema,
   teamIdParamSchema,
   joinTeamSchema,
-  approveMemberSchema
+  approveMemberSchema,
 } from '../validators/team';
 
 // Create router
@@ -28,7 +28,12 @@ const teamRepository = new TeamRepository();
 const teamMemberRepository = new TeamMemberRepository();
 const userRepository = new UserRepository();
 const leagueRepository = new LeagueRepository();
-const teamService = new TeamService(teamRepository, teamMemberRepository, userRepository, leagueRepository);
+const teamService = new TeamService(
+  teamRepository,
+  teamMemberRepository,
+  userRepository,
+  leagueRepository
+);
 const teamController = new TeamController(teamService);
 
 // Apply authentication middleware to all team routes
@@ -347,6 +352,10 @@ router.post('/:id/join', validate(joinTeamSchema), teamController.joinTeam);
  *               success: false
  *               message: Membership not found
  */
-router.post('/:id/members/:userId/approve', validate(approveMemberSchema), teamController.approveMember);
+router.post(
+  '/:id/members/:userId/approve',
+  validate(approveMemberSchema),
+  teamController.approveMember
+);
 
 export default router;

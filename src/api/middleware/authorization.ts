@@ -8,11 +8,15 @@ import { AuthenticatedRequest } from './auth';
  * Creates middleware that checks if user has required role(s)
  */
 export const requireRole = (...allowedRoles: UserRole[]) => {
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+  return (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): void => {
     if (!req.user) {
       res.status(401).json({
         error: 'Authentication required',
-        message: 'User must be authenticated to access this resource'
+        message: 'User must be authenticated to access this resource',
       });
       return;
     }
@@ -20,7 +24,7 @@ export const requireRole = (...allowedRoles: UserRole[]) => {
     if (!allowedRoles.includes(req.user.role)) {
       res.status(403).json({
         error: 'Insufficient permissions',
-        message: `Access denied. Required role: ${allowedRoles.join(' or ')}`
+        message: `Access denied. Required role: ${allowedRoles.join(' or ')}`,
       });
       return;
     }
@@ -40,7 +44,7 @@ export const requireOrganizer = (
   if (!req.user) {
     res.status(401).json({
       error: 'Authentication required',
-      message: 'User must be authenticated to access this resource'
+      message: 'User must be authenticated to access this resource',
     });
     return;
   }
@@ -48,7 +52,7 @@ export const requireOrganizer = (
   if (!UserDomain.hasOrganizerPrivileges(req.user)) {
     res.status(403).json({
       error: 'Insufficient permissions',
-      message: 'Organizer privileges required'
+      message: 'Organizer privileges required',
     });
     return;
   }
@@ -67,7 +71,7 @@ export const requireAdmin = (
   if (!req.user) {
     res.status(401).json({
       error: 'Authentication required',
-      message: 'User must be authenticated to access this resource'
+      message: 'User must be authenticated to access this resource',
     });
     return;
   }
@@ -75,7 +79,7 @@ export const requireAdmin = (
   if (!UserDomain.hasAdminPrivileges(req.user)) {
     res.status(403).json({
       error: 'Insufficient permissions',
-      message: 'Administrator privileges required'
+      message: 'Administrator privileges required',
     });
     return;
   }
@@ -95,7 +99,7 @@ export const requireCaptainOrOrganizer = async (
   if (!req.user) {
     res.status(401).json({
       error: 'Authentication required',
-      message: 'User must be authenticated to access this resource'
+      message: 'User must be authenticated to access this resource',
     });
     return;
   }
@@ -111,21 +115,23 @@ export const requireCaptainOrOrganizer = async (
   if (!teamId) {
     res.status(400).json({
       error: 'Bad request',
-      message: 'Team ID is required'
+      message: 'Team ID is required',
     });
     return;
   }
 
   try {
     // Import here to avoid circular dependencies
-    const { TeamRepository } = await import('../../infrastructure/repositories');
+    const { TeamRepository } = await import(
+      '../../infrastructure/repositories'
+    );
     const teamRepository = new TeamRepository();
     const team = await teamRepository.findById(teamId);
 
     if (!team) {
       res.status(404).json({
         error: 'Not found',
-        message: 'Team not found'
+        message: 'Team not found',
       });
       return;
     }
@@ -133,7 +139,7 @@ export const requireCaptainOrOrganizer = async (
     if (team.captainId !== req.user.id) {
       res.status(403).json({
         error: 'Insufficient permissions',
-        message: 'Must be team captain or organizer to perform this action'
+        message: 'Must be team captain or organizer to perform this action',
       });
       return;
     }
@@ -145,7 +151,7 @@ export const requireCaptainOrOrganizer = async (
     });
     res.status(500).json({
       error: 'Internal server error',
-      message: 'Authorization service unavailable'
+      message: 'Authorization service unavailable',
     });
   }
 };
@@ -162,7 +168,7 @@ export const requireOwnerOrOrganizer = (
   if (!req.user) {
     res.status(401).json({
       error: 'Authentication required',
-      message: 'User must be authenticated to access this resource'
+      message: 'User must be authenticated to access this resource',
     });
     return;
   }
@@ -174,12 +180,13 @@ export const requireOwnerOrOrganizer = (
   }
 
   // Check if user owns the resource
-  const targetUserId = req.params['userId'] || req.body.userId || req.params['id'];
-  
+  const targetUserId =
+    req.params['userId'] || req.body.userId || req.params['id'];
+
   if (targetUserId && targetUserId !== req.user.id) {
     res.status(403).json({
       error: 'Insufficient permissions',
-      message: 'Can only access your own resources'
+      message: 'Can only access your own resources',
     });
     return;
   }

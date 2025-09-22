@@ -12,42 +12,42 @@ export const createTeamSchema = z.object({
       .trim(),
     color: z
       .string()
-      .regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color (e.g., #FF0000)')
+      .regex(
+        /^#[0-9A-Fa-f]{6}$/,
+        'Color must be a valid hex color (e.g., #FF0000)'
+      )
       .optional(),
-    leagueId: z
-      .string()
-      .cuid('Invalid league ID format')
-  })
+    leagueId: z.string().cuid('Invalid league ID format'),
+  }),
 });
 
 /**
  * Validation schema for updating a team
  */
 export const updateTeamSchema = z.object({
-  body: z.object({
-    name: z
-      .string()
-      .min(2, 'Team name must be at least 2 characters')
-      .max(100, 'Team name must not exceed 100 characters')
-      .trim()
-      .optional(),
-    color: z
-      .string()
-      .regex(/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color (e.g., #FF0000)')
-      .optional(),
-    captainId: z
-      .string()
-      .cuid('Invalid captain ID format')
-      .optional()
-  }).refine(
-    (data) => Object.keys(data).length > 0,
-    {
-      message: 'At least one field must be provided for update'
-    }
-  ),
+  body: z
+    .object({
+      name: z
+        .string()
+        .min(2, 'Team name must be at least 2 characters')
+        .max(100, 'Team name must not exceed 100 characters')
+        .trim()
+        .optional(),
+      color: z
+        .string()
+        .regex(
+          /^#[0-9A-Fa-f]{6}$/,
+          'Color must be a valid hex color (e.g., #FF0000)'
+        )
+        .optional(),
+      captainId: z.string().cuid('Invalid captain ID format').optional(),
+    })
+    .refine(data => Object.keys(data).length > 0, {
+      message: 'At least one field must be provided for update',
+    }),
   params: z.object({
-    id: z.string().cuid('Invalid team ID format')
-  })
+    id: z.string().cuid('Invalid team ID format'),
+  }),
 });
 
 /**
@@ -55,8 +55,8 @@ export const updateTeamSchema = z.object({
  */
 export const teamIdParamSchema = z.object({
   params: z.object({
-    id: z.string().cuid('Invalid team ID format')
-  })
+    id: z.string().cuid('Invalid team ID format'),
+  }),
 });
 
 /**
@@ -64,8 +64,8 @@ export const teamIdParamSchema = z.object({
  */
 export const joinTeamSchema = z.object({
   params: z.object({
-    id: z.string().cuid('Invalid team ID format')
-  })
+    id: z.string().cuid('Invalid team ID format'),
+  }),
 });
 
 /**
@@ -74,8 +74,8 @@ export const joinTeamSchema = z.object({
 export const approveMemberSchema = z.object({
   params: z.object({
     id: z.string().cuid('Invalid team ID format'),
-    userId: z.string().cuid('Invalid user ID format')
-  })
+    userId: z.string().cuid('Invalid user ID format'),
+  }),
 });
 
 /**
@@ -83,8 +83,8 @@ export const approveMemberSchema = z.object({
  */
 export const getTeamsByLeagueSchema = z.object({
   params: z.object({
-    leagueId: z.string().cuid('Invalid league ID format')
-  })
+    leagueId: z.string().cuid('Invalid league ID format'),
+  }),
 });
 
 /**

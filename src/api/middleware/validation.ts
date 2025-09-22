@@ -12,7 +12,7 @@ export const validate = (schema: z.ZodSchema) => {
       const validatedData = schema.parse({
         body: req.body,
         params: req.params,
-        query: req.query
+        query: req.query,
       });
 
       // Replace request data with validated and transformed data
@@ -24,16 +24,16 @@ export const validate = (schema: z.ZodSchema) => {
     } catch (error) {
       if (error instanceof ZodError) {
         // Format Zod validation errors
-        const formattedErrors = error.errors.map((err) => ({
+        const formattedErrors = error.errors.map(err => ({
           field: err.path.join('.'),
           message: err.message,
-          code: err.code
+          code: err.code,
         }));
 
         res.status(400).json({
           error: 'Validation failed',
           message: 'Request data is invalid',
-          details: formattedErrors
+          details: formattedErrors,
         });
         return;
       }
@@ -44,7 +44,7 @@ export const validate = (schema: z.ZodSchema) => {
       });
       res.status(500).json({
         error: 'Internal server error',
-        message: 'Validation service unavailable'
+        message: 'Validation service unavailable',
       });
     }
   };
@@ -61,26 +61,28 @@ export const validateBody = (schema: z.ZodSchema) => {
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const formattedErrors = error.errors.map((err) => ({
+        const formattedErrors = error.errors.map(err => ({
           field: err.path.join('.'),
           message: err.message,
-          code: err.code
+          code: err.code,
         }));
 
         res.status(400).json({
           error: 'Validation failed',
           message: 'Request body is invalid',
-          details: formattedErrors
+          details: formattedErrors,
         });
         return;
       }
 
       import('../../config/logger').then(({ appLogger }) => {
-        appLogger.logError(error as Error, req, { middleware: 'bodyValidation' });
+        appLogger.logError(error as Error, req, {
+          middleware: 'bodyValidation',
+        });
       });
       res.status(500).json({
         error: 'Internal server error',
-        message: 'Validation service unavailable'
+        message: 'Validation service unavailable',
       });
     }
   };
@@ -97,26 +99,28 @@ export const validateParams = (schema: z.ZodSchema) => {
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const formattedErrors = error.errors.map((err) => ({
+        const formattedErrors = error.errors.map(err => ({
           field: err.path.join('.'),
           message: err.message,
-          code: err.code
+          code: err.code,
         }));
 
         res.status(400).json({
           error: 'Validation failed',
           message: 'Request parameters are invalid',
-          details: formattedErrors
+          details: formattedErrors,
         });
         return;
       }
 
       import('../../config/logger').then(({ appLogger }) => {
-        appLogger.logError(error as Error, req, { middleware: 'paramsValidation' });
+        appLogger.logError(error as Error, req, {
+          middleware: 'paramsValidation',
+        });
       });
       res.status(500).json({
         error: 'Internal server error',
-        message: 'Validation service unavailable'
+        message: 'Validation service unavailable',
       });
     }
   };
@@ -133,26 +137,28 @@ export const validateQuery = (schema: z.ZodSchema) => {
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const formattedErrors = error.errors.map((err) => ({
+        const formattedErrors = error.errors.map(err => ({
           field: err.path.join('.'),
           message: err.message,
-          code: err.code
+          code: err.code,
         }));
 
         res.status(400).json({
           error: 'Validation failed',
           message: 'Query parameters are invalid',
-          details: formattedErrors
+          details: formattedErrors,
         });
         return;
       }
 
       import('../../config/logger').then(({ appLogger }) => {
-        appLogger.logError(error as Error, req, { middleware: 'queryValidation' });
+        appLogger.logError(error as Error, req, {
+          middleware: 'queryValidation',
+        });
       });
       res.status(500).json({
         error: 'Internal server error',
-        message: 'Validation service unavailable'
+        message: 'Validation service unavailable',
       });
     }
   };

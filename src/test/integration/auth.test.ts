@@ -5,7 +5,11 @@
 
 import request from 'supertest';
 import app from '../../app';
-import { setupTestDatabase, teardownTestDatabase, cleanDatabase } from '../database';
+import {
+  setupTestDatabase,
+  teardownTestDatabase,
+  cleanDatabase,
+} from '../database';
 
 describe('Authentication Integration Tests', () => {
   beforeAll(async () => {
@@ -24,7 +28,7 @@ describe('Authentication Integration Tests', () => {
     const validSignupData = {
       email: 'test@example.com',
       password: 'password123',
-      name: 'Test User'
+      name: 'Test User',
     };
 
     it('should create user and return JWT cookie', async () => {
@@ -38,17 +42,19 @@ describe('Authentication Integration Tests', () => {
         user: {
           email: validSignupData.email,
           name: validSignupData.name,
-          role: 'USER'
-        }
+          role: 'USER',
+        },
       });
 
       expect(response.body.user.id).toBeDefined();
       expect(response.body.user.passwordHash).toBeUndefined();
-      
+
       // Check JWT cookie is set
       const cookies = response.headers['set-cookie'];
       expect(cookies).toBeDefined();
-      expect(cookies.some((cookie: string) => cookie.startsWith('token='))).toBe(true);
+      expect(
+        cookies.some((cookie: string) => cookie.startsWith('token='))
+      ).toBe(true);
     });
 
     it('should return 400 for invalid email', async () => {
@@ -56,7 +62,7 @@ describe('Authentication Integration Tests', () => {
         .post('/auth/signup')
         .send({
           ...validSignupData,
-          email: 'invalid-email'
+          email: 'invalid-email',
         })
         .expect(400);
 
@@ -69,7 +75,7 @@ describe('Authentication Integration Tests', () => {
         .post('/auth/signup')
         .send({
           ...validSignupData,
-          password: 'weak'
+          password: 'weak',
         })
         .expect(400);
 
@@ -79,10 +85,7 @@ describe('Authentication Integration Tests', () => {
 
     it('should return 400 for duplicate email', async () => {
       // First signup
-      await request(app)
-        .post('/auth/signup')
-        .send(validSignupData)
-        .expect(201);
+      await request(app).post('/auth/signup').send(validSignupData).expect(201);
 
       // Second signup with same email
       const response = await request(app)
@@ -98,7 +101,7 @@ describe('Authentication Integration Tests', () => {
       const response = await request(app)
         .post('/auth/signup')
         .send({
-          email: validSignupData.email
+          email: validSignupData.email,
           // Missing password and name
         })
         .expect(400);
@@ -111,14 +114,12 @@ describe('Authentication Integration Tests', () => {
     const userData = {
       email: 'test@example.com',
       password: 'password123',
-      name: 'Test User'
+      name: 'Test User',
     };
 
     beforeEach(async () => {
       // Create user for login tests
-      await request(app)
-        .post('/auth/signup')
-        .send(userData);
+      await request(app).post('/auth/signup').send(userData);
     });
 
     it('should login successfully with valid credentials', async () => {
@@ -126,7 +127,7 @@ describe('Authentication Integration Tests', () => {
         .post('/auth/login')
         .send({
           email: userData.email,
-          password: userData.password
+          password: userData.password,
         })
         .expect(200);
 
@@ -135,14 +136,16 @@ describe('Authentication Integration Tests', () => {
         user: {
           email: userData.email,
           name: userData.name,
-          role: 'USER'
-        }
+          role: 'USER',
+        },
       });
 
       // Check JWT cookie is set
       const cookies = response.headers['set-cookie'];
       expect(cookies).toBeDefined();
-      expect(cookies.some((cookie: string) => cookie.startsWith('token='))).toBe(true);
+      expect(
+        cookies.some((cookie: string) => cookie.startsWith('token='))
+      ).toBe(true);
     });
 
     it('should return 401 for invalid email', async () => {
@@ -150,7 +153,7 @@ describe('Authentication Integration Tests', () => {
         .post('/auth/login')
         .send({
           email: 'nonexistent@example.com',
-          password: userData.password
+          password: userData.password,
         })
         .expect(401);
 
@@ -163,7 +166,7 @@ describe('Authentication Integration Tests', () => {
         .post('/auth/login')
         .send({
           email: userData.email,
-          password: 'wrongpassword'
+          password: 'wrongpassword',
         })
         .expect(401);
 
@@ -175,7 +178,7 @@ describe('Authentication Integration Tests', () => {
       const response = await request(app)
         .post('/auth/login')
         .send({
-          email: userData.email
+          email: userData.email,
           // Missing password
         })
         .expect(400);
@@ -188,7 +191,7 @@ describe('Authentication Integration Tests', () => {
     const userData = {
       email: 'test@example.com',
       password: 'password123',
-      name: 'Test User'
+      name: 'Test User',
     };
 
     it('should logout successfully', async () => {
@@ -207,21 +210,22 @@ describe('Authentication Integration Tests', () => {
 
       expect(response.body).toMatchObject({
         success: true,
-        message: 'Logged out successfully'
+        message: 'Logged out successfully',
       });
 
       // Check cookie is cleared
       const logoutCookies = response.headers['set-cookie'];
       expect(logoutCookies).toBeDefined();
-      expect(logoutCookies.some((cookie: string) => 
-        cookie.includes('token=') && cookie.includes('Max-Age=0')
-      )).toBe(true);
+      expect(
+        logoutCookies.some(
+          (cookie: string) =>
+            cookie.includes('token=') && cookie.includes('Max-Age=0')
+        )
+      ).toBe(true);
     });
 
     it('should work even without authentication', async () => {
-      const response = await request(app)
-        .post('/auth/logout')
-        .expect(200);
+      const response = await request(app).post('/auth/logout').expect(200);
 
       expect(response.body.success).toBe(true);
     });
@@ -231,7 +235,7 @@ describe('Authentication Integration Tests', () => {
     const userData = {
       email: 'test@example.com',
       password: 'password123',
-      name: 'Test User'
+      name: 'Test User',
     };
 
     it('should complete full signup -> login -> logout flow', async () => {
@@ -263,17 +267,14 @@ describe('Authentication Integration Tests', () => {
         .post('/auth/login')
         .send({
           email: userData.email,
-          password: userData.password
+          password: userData.password,
         })
         .expect(200);
 
       const loginCookies = loginResponse.headers['set-cookie'];
 
       // 5. Access protected endpoint with login token
-      await request(app)
-        .get('/me')
-        .set('Cookie', loginCookies)
-        .expect(200);
+      await request(app).get('/me').set('Cookie', loginCookies).expect(200);
 
       // 6. Final logout
       await request(app)
@@ -288,21 +289,19 @@ describe('Authentication Integration Tests', () => {
       const userData = {
         email: 'test@example.com',
         password: 'password123',
-        name: 'Test User'
+        name: 'Test User',
       };
 
       // Make multiple rapid requests to exceed rate limit
-      const requests = Array(12).fill(null).map(() =>
-        request(app)
-          .post('/auth/signup')
-          .send(userData)
-      );
+      const requests = Array(12)
+        .fill(null)
+        .map(() => request(app).post('/auth/signup').send(userData));
 
       const responses = await Promise.all(requests);
-      
+
       // First request should succeed
       expect(responses[0].status).toBe(201);
-      
+
       // Some later requests should be rate limited
       const rateLimitedResponses = responses.filter(r => r.status === 429);
       expect(rateLimitedResponses.length).toBeGreaterThan(0);

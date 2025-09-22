@@ -126,30 +126,40 @@ export class TeamMemberDomain {
    * Checks if member can be rejected (is currently pending or approved)
    */
   static canBeRejected(member: TeamMember): boolean {
-    return member.status === MemberStatus.PENDING || member.status === MemberStatus.APPROVED;
+    return (
+      member.status === MemberStatus.PENDING ||
+      member.status === MemberStatus.APPROVED
+    );
   }
 
   /**
    * Creates team member data for a new captain
    */
-  static createCaptainMemberData(teamId: string, userId: string): CreateTeamMemberData {
+  static createCaptainMemberData(
+    teamId: string,
+    userId: string
+  ): CreateTeamMemberData {
     return {
       teamId,
       userId,
       role: MemberRole.CAPTAIN,
-      status: MemberStatus.APPROVED
+      status: MemberStatus.APPROVED,
     };
   }
 
   /**
    * Creates team member data for a new regular member
    */
-  static createRegularMemberData(teamId: string, userId: string, autoApprove = false): CreateTeamMemberData {
+  static createRegularMemberData(
+    teamId: string,
+    userId: string,
+    autoApprove = false
+  ): CreateTeamMemberData {
     return {
       teamId,
       userId,
       role: MemberRole.MEMBER,
-      status: autoApprove ? MemberStatus.APPROVED : MemberStatus.PENDING
+      status: autoApprove ? MemberStatus.APPROVED : MemberStatus.PENDING,
     };
   }
 
@@ -160,7 +170,7 @@ export class TeamMemberDomain {
     return {
       ...data,
       role: data.role ?? MemberRole.MEMBER,
-      status: data.status ?? MemberStatus.PENDING
+      status: data.status ?? MemberStatus.PENDING,
     };
   }
 
@@ -169,7 +179,7 @@ export class TeamMemberDomain {
    */
   static createApprovalData(): UpdateTeamMemberData {
     return {
-      status: MemberStatus.APPROVED
+      status: MemberStatus.APPROVED,
     };
   }
 
@@ -178,7 +188,7 @@ export class TeamMemberDomain {
    */
   static createRejectionData(): UpdateTeamMemberData {
     return {
-      status: MemberStatus.REJECTED
+      status: MemberStatus.REJECTED,
     };
   }
 
@@ -186,7 +196,10 @@ export class TeamMemberDomain {
    * Checks if user can approve/reject members (business rule)
    * This would typically be used with user role and team captain status
    */
-  static canManageMembers(memberRole: MemberRole, userIsOrganizer: boolean): boolean {
+  static canManageMembers(
+    memberRole: MemberRole,
+    userIsOrganizer: boolean
+  ): boolean {
     return memberRole === MemberRole.CAPTAIN || userIsOrganizer;
   }
 }

@@ -1,9 +1,13 @@
 import { Request, Response } from 'express';
-import { errorHandler, AppError, ValidationError } from '../api/middleware/errorHandler';
+import {
+  errorHandler,
+  AppError,
+  ValidationError,
+} from '../api/middleware/errorHandler';
 import { requestLogger, requestId } from '../api/middleware/requestLogger';
 
 // Mock Express request and response objects
-const mockRequest = (overrides = {}) => {
+const mockRequest = (overrides = {}): any => {
   return {
     method: 'GET',
     url: '/test',
@@ -19,7 +23,7 @@ const mockRequest = (overrides = {}) => {
   } as unknown as Request;
 };
 
-const mockResponse = () => {
+const mockResponse = (): any => {
   const res = {
     status: jest.fn().mockReturnThis(),
     json: jest.fn().mockReturnThis(),
@@ -90,7 +94,7 @@ describe('Error Handling Integration', () => {
 
     it('should include request ID in error response', () => {
       const req = mockRequest({
-        headers: { 'x-request-id': 'test-request-123' }
+        headers: { 'x-request-id': 'test-request-123' },
       });
       const res = mockResponse();
       const error = new AppError('Test error', 400);
@@ -135,20 +139,26 @@ describe('Error Handling Integration', () => {
       requestId(req, res, mockNext);
 
       expect(req.headers['x-request-id']).toBeDefined();
-      expect(res.setHeader).toHaveBeenCalledWith('X-Request-ID', expect.any(String));
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'X-Request-ID',
+        expect.any(String)
+      );
       expect(mockNext).toHaveBeenCalled();
     });
 
     it('should preserve existing request ID', () => {
       const req = mockRequest({
-        headers: { 'x-request-id': 'existing-id-123' }
+        headers: { 'x-request-id': 'existing-id-123' },
       });
       const res = mockResponse();
 
       requestId(req, res, mockNext);
 
       expect(req.headers['x-request-id']).toBe('existing-id-123');
-      expect(res.setHeader).toHaveBeenCalledWith('X-Request-ID', 'existing-id-123');
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'X-Request-ID',
+        'existing-id-123'
+      );
       expect(mockNext).toHaveBeenCalled();
     });
 
@@ -158,7 +168,7 @@ describe('Error Handling Integration', () => {
 
       // Mock the original end method
       const originalEnd = res.end;
-      res.end = jest.fn().mockImplementation(function(chunk, encoding) {
+      res.end = jest.fn().mockImplementation(function (chunk, encoding) {
         return originalEnd.call(this, chunk, encoding);
       });
 

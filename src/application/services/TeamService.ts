@@ -3,27 +3,26 @@
  * Handles team operations including creation, joining, and member management
  */
 
-import { 
-  ITeamRepository, 
-  ITeamMemberRepository, 
-  IUserRepository, 
-  ILeagueRepository 
+import {
+  ITeamRepository,
+  ITeamMemberRepository,
+  IUserRepository,
+  ILeagueRepository,
 } from '../../infrastructure/repositories/interfaces';
-import { 
-  CreateTeamDTO, 
-  UpdateTeamDTO, 
-  TeamWithMembersDTO, 
-  TeamSummaryDTO, 
+import {
+  CreateTeamDTO,
+  UpdateTeamDTO,
+  TeamWithMembersDTO,
+  TeamSummaryDTO,
   TeamMembershipDTO,
   TeamMemberDTO,
-  ApproveMemberDTO
+  ApproveMemberDTO,
 } from '../dtos/team.dto';
-import { 
-  Team, 
-  CreateTeamData, 
-  UpdateTeamData, 
-  CreateTeamMemberData, 
-  UpdateTeamMemberData 
+import {
+  CreateTeamData,
+  UpdateTeamData,
+  CreateTeamMemberData,
+  UpdateTeamMemberData,
 } from '../../domain/entities';
 import { UserRole, MemberRole, MemberStatus } from '../../domain/enums';
 
@@ -45,7 +44,7 @@ export class TeamValidationError extends Error {
 }
 
 export class DuplicateTeamNameError extends Error {
-  constructor(name: string, leagueId: string) {
+  constructor(name: string, _leagueId: string) {
     super(`Team with name '${name}' already exists in this league`);
     this.name = 'DuplicateTeamNameError';
   }
@@ -77,7 +76,10 @@ export class TeamService {
    * Create a new team with automatic captain assignment
    * Requirements: 4.1, 4.2
    */
-  async createTeam(teamData: CreateTeamDTO, captainId: string): Promise<TeamWithMembersDTO> {
+  async createTeam(
+    teamData: CreateTeamDTO,
+    captainId: string
+  ): Promise<TeamWithMembersDTO> {
     // Verify captain exists
     const captain = await this.userRepository.findById(captainId);
     if (!captain) {
@@ -91,7 +93,10 @@ export class TeamService {
     }
 
     // Check for duplicate team name in league
-    const existingTeam = await this.teamRepository.findByNameAndLeague(teamData.name, teamData.leagueId);
+    const existingTeam = await this.teamRepository.findByNameAndLeague(
+      teamData.name,
+      teamData.leagueId
+    );
     if (existingTeam) {
       throw new DuplicateTeamNameError(teamData.name, teamData.leagueId);
     }
@@ -99,9 +104,9 @@ export class TeamService {
     // Create team
     const createTeamData: CreateTeamData = {
       name: teamData.name,
-      color: teamData.color,
+      ...(teamData.color && { color: teamData.color }),
       leagueId: teamData.leagueId,
-      captainId: captainId
+      captainId: captainId,
     };
 
     const team = await this.teamRepository.create(createTeamData);
@@ -111,7 +116,7 @@ export class TeamService {
       teamId: team.id,
       userId: captainId,
       role: MemberRole.CAPTAIN,
-      status: MemberStatus.APPROVED
+      status: MemberStatus.APPROVED,
     };
 
     await this.teamMemberRepository.create(createMemberData);
@@ -129,9 +134,10 @@ export class TeamService {
       throw new TeamNotFoundError(teamId);
     }
 
-    const membersWithUsers = await this.teamMemberRepository.findByTeamIdWithUsers(teamId);
+    const membersWithUsers =
+      await this.teamMemberRepository.findByTeamIdWithUsers(teamId);
     const captain = await this.userRepository.findById(team.captainId);
-    
+
     if (!captain) {
       throw new TeamValidationError('Team captain not found');
     }
@@ -139,27 +145,28 @@ export class TeamService {
     const members: TeamMemberDTO[] = membersWithUsers.map(member => ({
       id: member.id,
       userId: member.userId,
-      userName: member.user.name,
-      userEmail: member.user.email,
+      userName: member.userName,
+      userEmail: member.userEmail,
       role: member.role,
       status: member.status,
-      createdAt: member.createdAt
+      createdAt: member.createdAt,
     }));
 
     const memberCount = await this.teamMemberRepository.countByTeamId(teamId);
-    const approvedMemberCount = await this.teamMemberRepository.countApprovedByTeamId(teamId);
+    const approvedMemberCount =
+      await this.teamMemberRepository.countApprovedByTeamId(teamId);
 
     return {
       id: team.id,
       name: team.name,
-      color: team.color,
+      ...(team.color && { color: team.color }),
       leagueId: team.leagueId,
       captainId: team.captainId,
       captainName: captain.name,
       createdAt: team.createdAt,
       members,
       memberCount,
-      approvedMemberCount
+      approvedMemberCount,
     };
   }
 
@@ -174,18 +181,19 @@ export class TeamService {
       throw new TeamValidationError('League not found');
     }
 
-    const teamSummaries = await this.teamRepository.findByLeagueIdWithSummary(leagueId);
-    
+    const teamSummaries =
+      await this.teamRepository.findByLeagueIdWithSummary(leagueId);
+
     return teamSummaries.map(summary => ({
       id: summary.id,
       name: summary.name,
-      color: summary.color,
+      ...(summary.color && { color: summary.color }),
       leagueId: summary.leagueId,
       captainId: summary.captainId,
       captainName: summary.captainName,
       memberCount: summary.memberCount,
-      approvedMemberCount: summary.approvedMemberCount,
-      createdAt: summary.createdAt
+      approvedMemberCount: 0, // TODO: Calculate approved member count
+      createdAt: summary.createdAt,
     }));
   }
 
@@ -207,21 +215,24 @@ export class TeamService {
     }
 
     // Check if user is already a member
-    const existingMembership = await this.teamMemberRepository.findByTeamAndUser(teamId, userId);
+    const existingMembership =
+      await this.teamMemberRepository.findByTeamAndUser(teamId, userId);
     if (existingMembership) {
       throw new TeamMembershipError('User is already a member of this team');
     }
 
     // Determine initial status based on AUTO_APPROVE_JOINS setting
     const autoApprove = process.env['AUTO_APPROVE_JOINS'] === 'true';
-    const initialStatus = autoApprove ? MemberStatus.APPROVED : MemberStatus.PENDING;
+    const initialStatus = autoApprove
+      ? MemberStatus.APPROVED
+      : MemberStatus.PENDING;
 
     // Create team membership
     const createMemberData: CreateTeamMemberData = {
       teamId: teamId,
       userId: userId,
       role: MemberRole.MEMBER,
-      status: initialStatus
+      status: initialStatus,
     };
 
     const membership = await this.teamMemberRepository.create(createMemberData);
@@ -233,7 +244,7 @@ export class TeamService {
       userId: userId,
       role: membership.role,
       status: membership.status,
-      createdAt: membership.createdAt
+      createdAt: membership.createdAt,
     };
   }
 
@@ -242,9 +253,9 @@ export class TeamService {
    * Requirements: 6.1, 6.2, 6.3
    */
   async approveMember(
-    teamId: string, 
-    userId: string, 
-    approverId: string, 
+    teamId: string,
+    userId: string,
+    approverId: string,
     approval: ApproveMemberDTO
   ): Promise<TeamMembershipDTO> {
     // Verify team exists
@@ -260,9 +271,9 @@ export class TeamService {
     }
 
     // Check if approver has permission (captain of team or organizer/admin)
-    const canApprove = 
-      team.captainId === approverId || 
-      approver.role === UserRole.ORGANIZER || 
+    const canApprove =
+      team.captainId === approverId ||
+      approver.role === UserRole.ORGANIZER ||
       approver.role === UserRole.ADMIN;
 
     if (!canApprove) {
@@ -270,18 +281,26 @@ export class TeamService {
     }
 
     // Find the membership
-    const membership = await this.teamMemberRepository.findByTeamAndUser(teamId, userId);
+    const membership = await this.teamMemberRepository.findByTeamAndUser(
+      teamId,
+      userId
+    );
     if (!membership) {
       throw new TeamMembershipError('Team membership not found');
     }
 
     // Update membership status
-    const newStatus = approval.approve ? MemberStatus.APPROVED : MemberStatus.REJECTED;
+    const newStatus = approval.approve
+      ? MemberStatus.APPROVED
+      : MemberStatus.REJECTED;
     const updateData: UpdateTeamMemberData = {
-      status: newStatus
+      status: newStatus,
     };
 
-    const updatedMembership = await this.teamMemberRepository.update(membership.id, updateData);
+    const updatedMembership = await this.teamMemberRepository.update(
+      membership.id,
+      updateData
+    );
 
     return {
       id: updatedMembership.id,
@@ -290,7 +309,7 @@ export class TeamService {
       userId: userId,
       role: updatedMembership.role,
       status: updatedMembership.status,
-      createdAt: updatedMembership.createdAt
+      createdAt: updatedMembership.createdAt,
     };
   }
 
@@ -298,7 +317,11 @@ export class TeamService {
    * Update team information (captain or organizer only)
    * Requirements: 8.2
    */
-  async updateTeam(teamId: string, updates: UpdateTeamDTO, requestingUserId: string): Promise<TeamWithMembersDTO> {
+  async updateTeam(
+    teamId: string,
+    updates: UpdateTeamDTO,
+    requestingUserId: string
+  ): Promise<TeamWithMembersDTO> {
     // Verify team exists
     const team = await this.teamRepository.findById(teamId);
     if (!team) {
@@ -311,9 +334,9 @@ export class TeamService {
       throw new TeamValidationError('Requesting user not found');
     }
 
-    const canUpdate = 
-      team.captainId === requestingUserId || 
-      requestingUser.role === UserRole.ORGANIZER || 
+    const canUpdate =
+      team.captainId === requestingUserId ||
+      requestingUser.role === UserRole.ORGANIZER ||
       requestingUser.role === UserRole.ADMIN;
 
     if (!canUpdate) {
@@ -322,7 +345,10 @@ export class TeamService {
 
     // Check for duplicate team name if name is being updated
     if (updates.name && updates.name !== team.name) {
-      const existingTeam = await this.teamRepository.findByNameAndLeague(updates.name, team.leagueId);
+      const existingTeam = await this.teamRepository.findByNameAndLeague(
+        updates.name,
+        team.leagueId
+      );
       if (existingTeam) {
         throw new DuplicateTeamNameError(updates.name, team.leagueId);
       }
@@ -338,7 +364,7 @@ export class TeamService {
     }
 
     await this.teamRepository.update(teamId, updateData);
-    
+
     return this.getTeamById(teamId);
   }
 
@@ -359,7 +385,10 @@ export class TeamService {
       throw new TeamValidationError('Requesting user not found');
     }
 
-    if (requestingUser.role !== UserRole.ORGANIZER && requestingUser.role !== UserRole.ADMIN) {
+    if (
+      requestingUser.role !== UserRole.ORGANIZER &&
+      requestingUser.role !== UserRole.ADMIN
+    ) {
       throw new InsufficientPermissionsError('delete team');
     }
 
@@ -372,9 +401,9 @@ export class TeamService {
    */
   async getUserTeamMemberships(userId: string): Promise<TeamMembershipDTO[]> {
     const memberships = await this.teamMemberRepository.findByUserId(userId);
-    
+
     const membershipDTOs: TeamMembershipDTO[] = [];
-    
+
     for (const membership of memberships) {
       const team = await this.teamRepository.findById(membership.teamId);
       if (team) {
@@ -385,7 +414,7 @@ export class TeamService {
           userId: membership.userId,
           role: membership.role,
           status: membership.status,
-          createdAt: membership.createdAt
+          createdAt: membership.createdAt,
         });
       }
     }

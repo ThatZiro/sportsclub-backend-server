@@ -5,12 +5,12 @@
 export enum MemberStatus {
   /** Membership request is pending approval */
   PENDING = 'PENDING',
-  
+
   /** Membership has been approved */
   APPROVED = 'APPROVED',
-  
+
   /** Membership has been rejected */
-  REJECTED = 'REJECTED'
+  REJECTED = 'REJECTED',
 }
 
 /**

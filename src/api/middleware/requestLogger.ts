@@ -5,7 +5,11 @@ import { appLogger } from '../../config/logger';
  * Request logging middleware
  * Logs incoming requests and outgoing responses with timing information
  */
-export const requestLogger = (req: Request, res: Response, next: NextFunction): void => {
+export const requestLogger = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   const startTime = Date.now();
 
   // Log incoming request
@@ -15,9 +19,9 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction): 
   const originalEnd = res.end;
 
   // Override res.end to log response
-  res.end = function(chunk?: any, encoding?: any): Response {
+  res.end = function (chunk?: any, encoding?: any): Response {
     const responseTime = Date.now() - startTime;
-    
+
     // Log response
     appLogger.logResponse(req, res.statusCode, responseTime);
 
@@ -32,11 +36,16 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction): 
  * Request ID middleware
  * Adds a unique request ID to each request for tracing
  */
-export const requestId = (req: Request, res: Response, next: NextFunction): void => {
+export const requestId = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   // Generate request ID if not provided
-  const reqId = req.headers['x-request-id'] as string || 
-                Math.random().toString(36).substring(2, 15) + 
-                Math.random().toString(36).substring(2, 15);
+  const reqId =
+    (req.headers['x-request-id'] as string) ||
+    Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15);
 
   // Add to request headers
   req.headers['x-request-id'] = reqId;

@@ -19,17 +19,21 @@ export class PublicController {
    * Get public league information by slug
    * Requirements: 3.1, 3.4
    */
-  getLeagueBySlug = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getLeagueBySlug = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const slug = req.params['slug'];
       if (!slug) {
         res.status(400).json({
           success: false,
-          message: 'League slug is required'
+          message: 'League slug is required',
         });
         return;
       }
-      
+
       const league = await this.leagueService.getLeagueBySlug(slug);
 
       // Return public league data (excluding sensitive information)
@@ -42,9 +46,9 @@ export class PublicController {
             name: league.name,
             slug: league.slug,
             season: league.season,
-            isActive: league.isActive
-          }
-        }
+            isActive: league.isActive,
+          },
+        },
       });
     } catch (error) {
       next(error);
@@ -56,20 +60,24 @@ export class PublicController {
    * Get public team listing for a league
    * Requirements: 3.2, 3.4
    */
-  getTeamsByLeagueSlug = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  getTeamsByLeagueSlug = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const slug = req.params['slug'];
       if (!slug) {
         res.status(400).json({
           success: false,
-          message: 'League slug is required'
+          message: 'League slug is required',
         });
         return;
       }
-      
+
       // First get the league to validate it exists and get the ID
       const league = await this.leagueService.getLeagueBySlug(slug);
-      
+
       // Get teams for this league
       const teams = await this.teamService.getTeamsByLeague(league.id);
 
@@ -80,7 +88,7 @@ export class PublicController {
         color: team.color,
         captainName: team.captainName,
         memberCount: team.approvedMemberCount, // Only show approved members in public view
-        createdAt: team.createdAt
+        createdAt: team.createdAt,
       }));
 
       res.status(200).json({
@@ -91,10 +99,10 @@ export class PublicController {
             id: league.id,
             name: league.name,
             slug: league.slug,
-            season: league.season
+            season: league.season,
           },
-          teams: publicTeams
-        }
+          teams: publicTeams,
+        },
       });
     } catch (error) {
       next(error);

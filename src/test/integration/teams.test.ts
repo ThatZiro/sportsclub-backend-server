@@ -5,7 +5,12 @@
 
 import request from 'supertest';
 import app from '../../app';
-import { setupTestDatabase, teardownTestDatabase, cleanDatabase, seedTestData } from '../database';
+import {
+  setupTestDatabase,
+  teardownTestDatabase,
+  cleanDatabase,
+  seedTestData,
+} from '../database';
 
 describe('Team Management Integration Tests', () => {
   let testData: any;
@@ -26,19 +31,17 @@ describe('Team Management Integration Tests', () => {
   describe('POST /teams', () => {
     it('should create team successfully', async () => {
       // Login as captain
-      const loginResponse = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'captain@test.com',
-          password: 'password123'
-        });
+      const loginResponse = await request(app).post('/auth/login').send({
+        email: 'captain@test.com',
+        password: 'password123',
+      });
 
       const cookies = loginResponse.headers['set-cookie'];
 
       const teamData = {
         name: 'New Team',
         color: '#00FF00',
-        leagueId: testData.league.id
+        leagueId: testData.league.id,
       };
 
       const response = await request(app)
@@ -53,8 +56,8 @@ describe('Team Management Integration Tests', () => {
           name: teamData.name,
           color: teamData.color,
           leagueId: teamData.leagueId,
-          captainId: testData.captain.id
-        }
+          captainId: testData.captain.id,
+        },
       });
 
       expect(response.body.team.id).toBeDefined();
@@ -63,22 +66,17 @@ describe('Team Management Integration Tests', () => {
     it('should return 401 without authentication', async () => {
       const teamData = {
         name: 'New Team',
-        leagueId: testData.league.id
+        leagueId: testData.league.id,
       };
 
-      await request(app)
-        .post('/teams')
-        .send(teamData)
-        .expect(401);
+      await request(app).post('/teams').send(teamData).expect(401);
     });
 
     it('should return 400 for invalid data', async () => {
-      const loginResponse = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'captain@test.com',
-          password: 'password123'
-        });
+      const loginResponse = await request(app).post('/auth/login').send({
+        email: 'captain@test.com',
+        password: 'password123',
+      });
 
       const cookies = loginResponse.headers['set-cookie'];
 
@@ -87,7 +85,7 @@ describe('Team Management Integration Tests', () => {
         .set('Cookie', cookies)
         .send({
           name: 'A', // Too short
-          leagueId: testData.league.id
+          leagueId: testData.league.id,
         })
         .expect(400);
 
@@ -95,12 +93,10 @@ describe('Team Management Integration Tests', () => {
     });
 
     it('should return 400 for duplicate team name in league', async () => {
-      const loginResponse = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'captain@test.com',
-          password: 'password123'
-        });
+      const loginResponse = await request(app).post('/auth/login').send({
+        email: 'captain@test.com',
+        password: 'password123',
+      });
 
       const cookies = loginResponse.headers['set-cookie'];
 
@@ -109,7 +105,7 @@ describe('Team Management Integration Tests', () => {
         .set('Cookie', cookies)
         .send({
           name: 'Test Team', // Already exists
-          leagueId: testData.league.id
+          leagueId: testData.league.id,
         })
         .expect(400);
 
@@ -120,12 +116,10 @@ describe('Team Management Integration Tests', () => {
 
   describe('GET /teams/:id', () => {
     it('should return team with members', async () => {
-      const loginResponse = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'captain@test.com',
-          password: 'password123'
-        });
+      const loginResponse = await request(app).post('/auth/login').send({
+        email: 'captain@test.com',
+        password: 'password123',
+      });
 
       const cookies = loginResponse.headers['set-cookie'];
 
@@ -139,8 +133,8 @@ describe('Team Management Integration Tests', () => {
         team: {
           id: testData.team.id,
           name: testData.team.name,
-          captainId: testData.captain.id
-        }
+          captainId: testData.captain.id,
+        },
       });
 
       expect(response.body.team.members).toBeDefined();
@@ -148,12 +142,10 @@ describe('Team Management Integration Tests', () => {
     });
 
     it('should return 404 for non-existent team', async () => {
-      const loginResponse = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'captain@test.com',
-          password: 'password123'
-        });
+      const loginResponse = await request(app).post('/auth/login').send({
+        email: 'captain@test.com',
+        password: 'password123',
+      });
 
       const cookies = loginResponse.headers['set-cookie'];
 
@@ -167,20 +159,16 @@ describe('Team Management Integration Tests', () => {
   describe('POST /teams/:id/join', () => {
     it('should join team successfully', async () => {
       // Create a new user to join the team
-      await request(app)
-        .post('/auth/signup')
-        .send({
-          email: 'newplayer@test.com',
-          password: 'password123',
-          name: 'New Player'
-        });
+      await request(app).post('/auth/signup').send({
+        email: 'newplayer@test.com',
+        password: 'password123',
+        name: 'New Player',
+      });
 
-      const loginResponse = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'newplayer@test.com',
-          password: 'password123'
-        });
+      const loginResponse = await request(app).post('/auth/login').send({
+        email: 'newplayer@test.com',
+        password: 'password123',
+      });
 
       const cookies = loginResponse.headers['set-cookie'];
 
@@ -194,18 +182,16 @@ describe('Team Management Integration Tests', () => {
         membership: {
           teamId: testData.team.id,
           role: 'MEMBER',
-          status: 'PENDING'
-        }
+          status: 'PENDING',
+        },
       });
     });
 
     it('should return 400 if already a member', async () => {
-      const loginResponse = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'player@test.com', // Already a member
-          password: 'password123'
-        });
+      const loginResponse = await request(app).post('/auth/login').send({
+        email: 'player@test.com', // Already a member
+        password: 'password123',
+      });
 
       const cookies = loginResponse.headers['set-cookie'];
 
@@ -219,12 +205,10 @@ describe('Team Management Integration Tests', () => {
     });
 
     it('should return 404 for non-existent team', async () => {
-      const loginResponse = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'captain@test.com',
-          password: 'password123'
-        });
+      const loginResponse = await request(app).post('/auth/login').send({
+        email: 'captain@test.com',
+        password: 'password123',
+      });
 
       const cookies = loginResponse.headers['set-cookie'];
 
@@ -237,17 +221,17 @@ describe('Team Management Integration Tests', () => {
 
   describe('POST /teams/:id/members/:userId/approve', () => {
     it('should approve member as captain', async () => {
-      const loginResponse = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'captain@test.com',
-          password: 'password123'
-        });
+      const loginResponse = await request(app).post('/auth/login').send({
+        email: 'captain@test.com',
+        password: 'password123',
+      });
 
       const cookies = loginResponse.headers['set-cookie'];
 
       const response = await request(app)
-        .post(`/teams/${testData.team.id}/members/${testData.player.id}/approve`)
+        .post(
+          `/teams/${testData.team.id}/members/${testData.player.id}/approve`
+        )
         .set('Cookie', cookies)
         .expect(200);
 
@@ -256,23 +240,23 @@ describe('Team Management Integration Tests', () => {
         membership: {
           teamId: testData.team.id,
           userId: testData.player.id,
-          status: 'APPROVED'
-        }
+          status: 'APPROVED',
+        },
       });
     });
 
     it('should approve member as organizer', async () => {
-      const loginResponse = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'organizer@test.com',
-          password: 'password123'
-        });
+      const loginResponse = await request(app).post('/auth/login').send({
+        email: 'organizer@test.com',
+        password: 'password123',
+      });
 
       const cookies = loginResponse.headers['set-cookie'];
 
       const response = await request(app)
-        .post(`/teams/${testData.team.id}/members/${testData.player.id}/approve`)
+        .post(
+          `/teams/${testData.team.id}/members/${testData.player.id}/approve`
+        )
         .set('Cookie', cookies)
         .expect(200);
 
@@ -280,17 +264,17 @@ describe('Team Management Integration Tests', () => {
     });
 
     it('should return 403 for regular user', async () => {
-      const loginResponse = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'player@test.com',
-          password: 'password123'
-        });
+      const loginResponse = await request(app).post('/auth/login').send({
+        email: 'player@test.com',
+        password: 'password123',
+      });
 
       const cookies = loginResponse.headers['set-cookie'];
 
       const response = await request(app)
-        .post(`/teams/${testData.team.id}/members/${testData.player.id}/approve`)
+        .post(
+          `/teams/${testData.team.id}/members/${testData.player.id}/approve`
+        )
         .set('Cookie', cookies)
         .expect(403);
 
@@ -301,29 +285,23 @@ describe('Team Management Integration Tests', () => {
   describe('Team Creation and Joining Workflow', () => {
     it('should complete full team creation and joining workflow', async () => {
       // 1. Create new users
-      await request(app)
-        .post('/auth/signup')
-        .send({
-          email: 'newcaptain@test.com',
-          password: 'password123',
-          name: 'New Captain'
-        });
+      await request(app).post('/auth/signup').send({
+        email: 'newcaptain@test.com',
+        password: 'password123',
+        name: 'New Captain',
+      });
 
-      await request(app)
-        .post('/auth/signup')
-        .send({
-          email: 'newmember@test.com',
-          password: 'password123',
-          name: 'New Member'
-        });
+      await request(app).post('/auth/signup').send({
+        email: 'newmember@test.com',
+        password: 'password123',
+        name: 'New Member',
+      });
 
       // 2. Captain creates team
-      const captainLogin = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'newcaptain@test.com',
-          password: 'password123'
-        });
+      const captainLogin = await request(app).post('/auth/login').send({
+        email: 'newcaptain@test.com',
+        password: 'password123',
+      });
 
       const captainCookies = captainLogin.headers['set-cookie'];
 
@@ -333,19 +311,17 @@ describe('Team Management Integration Tests', () => {
         .send({
           name: 'Workflow Team',
           color: '#FF00FF',
-          leagueId: testData.league.id
+          leagueId: testData.league.id,
         })
         .expect(201);
 
       const teamId = teamResponse.body.team.id;
 
       // 3. Member joins team
-      const memberLogin = await request(app)
-        .post('/auth/login')
-        .send({
-          email: 'newmember@test.com',
-          password: 'password123'
-        });
+      const memberLogin = await request(app).post('/auth/login').send({
+        email: 'newmember@test.com',
+        password: 'password123',
+      });
 
       const memberCookies = memberLogin.headers['set-cookie'];
 
